@@ -11,6 +11,8 @@ using UnityEngine;
 
 // Comment for git kraken by naveen
 
+// change after deleting meta file
+
 public class drive_script : MonoBehaviour
 {
 
