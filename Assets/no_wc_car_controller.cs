@@ -2,108 +2,83 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class no_wc_car_controller : MonoBehaviour{
-    public List<GameObject> springs;
-    public List<GameObject> wheels;
-    private Dictionary<GameObject, GameObject> points = new Dictionary<GameObject, GameObject>();
-    private Rigidbody rb;
+// Code adapted from: https://www.youtube.com/watch?v=x0LUiE0dxP0 
 
+public class no_wc_car_controller : MonoBehaviour{
+    public Rigidbody rb;
+
+    public List<GameObject> springs;
+
+    [Header("Suspension")]
     public float restLength;
     public float springTravel;
     public float springStiffness;
-    public float dampingCoefficient;
-    public float wheelRadius;
-
+    
     private float minLength;
     private float maxLength;
-    private float previousLength;
-    private float springLength;
-    private float springVelocity;
-    private float springForce;
-    private float damperForce;
+    private float[] springLength = new float[4];
 
+    private float springForce;
     private Vector3 suspensionForce;
 
-    private Vector3 force;
-    private float dampingForce;
-    private float damping;
+    [Header("Wheel")]
+    public float wheelRadius;
 
-
-
-
-
-    // Start is called before the first frame update
     void Start(){
         
-        rb = transform.root.GetComponent<Rigidbody>();
-
-        minLength = restLength - springTravel;
+        // rb = GetComponent<Rigidbody>();
+        minLength = restLength - springTravel;        
         maxLength = restLength + springTravel;
 
-        for(int i = 0; i < springs.Count; i++){
-            points.Add(springs[i], wheels[i]);
-        }
-         
     }
 
-    // Update is called once per frame
     void FixedUpdate(){
-        foreach(GameObject spring in springs){
-
-            GameObject wheel;
-            bool found = points.TryGetValue(spring, out wheel);
-
-            RaycastHit hit;
-            if(Physics.Raycast(spring.transform.position, -transform.up, out hit, maxLength + wheelRadius)){
-
-                // Debug.DrawRay(spring.transform.position, -transform.up *(springLength+wheelRadius),Color.green);
+        Debug.Log($"Max length = {maxLength}, Min length = {minLength}");
 
 
-                previousLength = springLength;
-                springLength = hit.distance - wheelRadius;
-                springLength = Mathf.Clamp(springLength, minLength, maxLength);
-                
-                springVelocity = (previousLength - springLength) / Time.fixedDeltaTime;
-                springForce = -springStiffness * (springLength - restLength);
-                dampingForce = dampingCoefficient * springVelocity;
-                Debug.Log("Spring force = " + springForce + " Damping force = " + dampingForce);
-                suspensionForce = (springForce - damperForce) * hit.normal;
-                
-                rb.AddForceAtPosition(suspensionForce, hit.point);
-                
-                if(found){
-                    wheel.transform.localPosition = new Vector3 (wheel.transform.localPosition.x, (wheelRadius - hit.distance), wheel.transform.localPosition.z);
-
-                }
-            }
-            else if (found){
-                wheel.transform.localPosition = new Vector3 (wheel.transform.localPosition.x, (wheelRadius - maxLength), wheel.transform.localPosition.z);
-
-
-            }
+        for(int i = 0; i<springs.Count; i++){
             
+            bool contact = Physics.Raycast(springs[i].transform.position, -transform.up, out RaycastHit hit, maxLength + wheelRadius);
+            // Debug.Log(contact);
+            if(contact){
+                springLength[i] = hit.distance - wheelRadius;
+
+                springForce = springStiffness * (restLength - springLength[i]);
+                suspensionForce = springForce * hit.normal;
+
+                rb.AddForceAtPosition(suspensionForce, hit.point);
+
+
+
+                
+            }           
         }
-        
     }
+
+    
+    
 
 
     void OnDrawGizmosSelected(){
 
+        for(int i = 0; i < springs.Count; i++){
         
-        foreach(GameObject spring in springs){
 
-            // Vector3 direction = -transform.up *(springLength+wheelRadius);
-            // Gizmos.DrawRay(spring.transform.position, direction);
+            Vector3 direction = -transform.up *(springLength[i]+wheelRadius);
+            Gizmos.DrawRay(springs[i].transform.position, direction);
 
-            Ray ray = new Ray(spring.transform.position, -transform.up);
+            Ray ray = new Ray(springs[i].transform.position, -transform.up);
 
             Gizmos.color = Color.blue;
-            Gizmos.DrawLine(ray.origin, -restLength * transform.up + spring.transform.position);
+            Gizmos.DrawLine(ray.origin, -springLength[i] * transform.up + springs[i].transform.position);
 
             Gizmos.color = Color.white;
-            Gizmos.DrawLine(-restLength * transform.up + spring.transform.position, -restLength * transform.up + spring.transform.position + transform.up * -wheelRadius);
+            Gizmos.DrawLine(-restLength * transform.up + springs[i].transform.position, -restLength * transform.up + springs[i].transform.position + transform.up * -wheelRadius);
 
 
+        
+            // Gizmos.color = Color.white;
+            // Gizmos.DrawRay(spring.transform.position, -transform.up * (maxLength + wheelRadius));
         }
         
     }
