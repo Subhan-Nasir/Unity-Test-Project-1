@@ -62,24 +62,25 @@ public class no_wc_car_controller : MonoBehaviour{
                 previousLength = springLength;
                 springLength = hit.distance - wheelRadius;
                 springLength = Mathf.Clamp(springLength, minLength, maxLength);
+                
                 springVelocity = (previousLength - springLength) / Time.fixedDeltaTime;
-                springForce = springStiffness * (restLength - springLength);
+                springForce = -springStiffness * (springLength - restLength);
                 dampingForce = dampingCoefficient * springVelocity;
-
-                suspensionForce = (springForce + damperForce) * hit.normal;
-                Debug.Log(springLength);
+                Debug.Log("Spring force = " + springForce + " Damping force = " + dampingForce);
+                suspensionForce = (springForce - damperForce) * hit.normal;
+                
                 rb.AddForceAtPosition(suspensionForce, hit.point);
                 
-                // if(found){
-                //     wheel.transform.localPosition = new Vector3 (wheel.transform.localPosition.x, (wheelRadius - hit.distance), wheel.transform.localPosition.z);
+                if(found){
+                    wheel.transform.localPosition = new Vector3 (wheel.transform.localPosition.x, (wheelRadius - hit.distance), wheel.transform.localPosition.z);
 
-                // }
+                }
             }
-            // else if (found){
-            //     wheel.transform.localPosition = new Vector3 (wheel.transform.localPosition.x, (wheelRadius - maxLength), wheel.transform.localPosition.z);
+            else if (found){
+                wheel.transform.localPosition = new Vector3 (wheel.transform.localPosition.x, (wheelRadius - maxLength), wheel.transform.localPosition.z);
 
 
-            // }
+            }
             
         }
         
