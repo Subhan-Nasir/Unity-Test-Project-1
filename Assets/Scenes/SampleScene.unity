@@ -2052,8 +2052,9 @@ MonoBehaviour:
   - {fileID: 1556938406}
   - {fileID: 817643516}
   restLength: 0.6
-  springTravel: 0.23
-  springStiffness: 30000
+  springTravel: 0.35
+  springStiffness: 20000
+  dampingCoefficient: 0
   wheelRadius: 0.23
 --- !u!54 &3940382263161169147
 Rigidbody:
