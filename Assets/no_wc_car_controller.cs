@@ -9,6 +9,10 @@ public class no_wc_car_controller : MonoBehaviour{
 
     public List<GameObject> springs;
 
+
+    [Header("Centre of mass")]    
+    public GameObject COM_Fidner;
+
     [Header("Suspension")]
     public float restLength;
     public float springTravel;
@@ -28,6 +32,13 @@ public class no_wc_car_controller : MonoBehaviour{
 
     [Header("Wheel")]
     public float wheelRadius;
+
+
+    void Awake(){
+        rb.centerOfMass = COM_Fidner.transform.localPosition;
+
+
+    }
 
     void Start(){
         
@@ -73,6 +84,9 @@ public class no_wc_car_controller : MonoBehaviour{
 
     void OnDrawGizmosSelected(){
 
+        Gizmos.color = Color.white;
+        Gizmos.DrawWireSphere( transform.TransformPoint(rb.centerOfMass),0.2f);
+
         for(int i = 0; i < springs.Count; i++){
         
 
@@ -86,7 +100,7 @@ public class no_wc_car_controller : MonoBehaviour{
             Gizmos.color = Color.white;
             Gizmos.DrawSphere(springs[i].transform.position, 0.1f);
 
-            Gizmos.DrawWireSphere( transform.TransformPoint(rb.centerOfMass),0.1f);
+            
             Gizmos.color = Color.blue;
                         
             Gizmos.DrawLine(ray.origin, -springLength[i] * transform.up + springs[i].transform.position);
