@@ -8,6 +8,7 @@ public class no_wc_car_controller : MonoBehaviour{
     public Rigidbody rb;
 
     public List<GameObject> springs;
+    public List<GameObject> wheels;
 
 
     [Header("Centre of mass")]    
@@ -28,15 +29,45 @@ public class no_wc_car_controller : MonoBehaviour{
     private float springForce;
     private float damperForce;
     private Vector3 suspensionForce;
-    
+
+    private float f_x; //Sideways direction
+    private float f_y; //Upwards direction
+    private float f_z; // Forwards direction
+
+    private Vector3 Fx;
+    private Vector3 Fy;
+    private Vector3 Fz;
 
     [Header("Wheel")]
     public float wheelRadius;
 
+    private float wheel_x;
+    private float wheel_y;
+    private float wheel_z;
+    private Vector3[] wheelVelocitiesLS = new Vector3[4];
+
+    [Header("Steering")]
+    public float steerAngle = 30f;
+    public float steerSpeed = 10f;
+
+    
+    private float steerInput;
+    private float wheelAngleLeft;
+    private float wheelAngleRight;
+    private float steerAngleLeft;
+    private float steerAngleRight;
+
+    
+    [Header("Ackermann Steering")]
+    public bool enableAckermannSteering = true;
+    public float wheelBase = 1.5f;
+    public float rearTrack = 1.085f;
+    public float turnRadius = 3.14f;
+
+
 
     void Awake(){
         rb.centerOfMass = COM_Fidner.transform.localPosition;
-
 
     }
 
@@ -44,9 +75,21 @@ public class no_wc_car_controller : MonoBehaviour{
         
         minLength = restLength - springTravel;        
         maxLength = restLength + springTravel;
+
+        // Initialise lists.
         for (int i = 0; i<4; i++){
             springLength[i] = restLength;
+            wheelVelocitiesLS[i] = new Vector3 (0,0,0);
         }
+
+    }
+
+    void Update(){
+        steerInput = Input.GetAxis("Horizontal");
+        ApplySteering();     
+
+                
+
 
     }
 
@@ -67,14 +110,44 @@ public class no_wc_car_controller : MonoBehaviour{
 
                 springForce = springStiffness * (restLength - springLength[i]);
                 damperForce = dampingCoefficient * springVelocity;
-                suspensionForce = (springForce - damperForce) * hit.normal;
-
-                rb.AddForceAtPosition(suspensionForce, hit.point);
-
-
+                f_y = springForce - damperForce;
+                suspensionForce = f_y * hit.normal;
 
                 
-            }           
+
+                wheels[i].transform.position = hit.point + hit.normal * wheelRadius;
+                wheelVelocitiesLS[i] = transform.InverseTransformDirection(rb.GetPointVelocity(hit.point));
+
+                Fz = (Input.GetAxis("Vertical") * springForce) * wheels[i].transform.forward;
+                
+                // if( i == 0 | i == 2){  // wheel is on the left of car
+
+                //     Fx = (wheelVelocitiesLS[i].x * springForce) * -wheels[i].transform.right; // apply force inwards
+                // }
+                // else { // wheel is on the right of car
+                //     Fx = (wheelVelocitiesLS[i].x * springForce) * -wheels[i].transform.right; // apply force inwards
+                // }
+                
+
+                
+
+                rb.AddForceAtPosition(suspensionForce + Fz, hit.point);
+
+                             
+                
+            }
+            else{
+
+            // wheel_x = wheels[i].transform.localPosition.x;
+            // wheel_y = maxLength + wheelRadius;
+            // wheel_z = wheels[i].transform.localPosition.z;
+
+            // wheels[i].transform.localPosition = new Vector3 (wheel_x, wheel_y, wheel_z);
+
+            }
+            
+            
+
         }
     }
 
@@ -96,13 +169,13 @@ public class no_wc_car_controller : MonoBehaviour{
 
             
 
-            Ray ray = new Ray(springs[i].transform.position, -transform.up);           
+                      
             Gizmos.color = Color.white;
             Gizmos.DrawSphere(springs[i].transform.position, 0.1f);
 
             
             Gizmos.color = Color.blue;
-                        
+            Ray ray = new Ray(springs[i].transform.position, -transform.up);           
             Gizmos.DrawLine(ray.origin, -springLength[i] * transform.up + springs[i].transform.position);
 
             Gizmos.color = Color.white;
@@ -115,4 +188,49 @@ public class no_wc_car_controller : MonoBehaviour{
         
     }
 
+    void ApplySteering(){
+
+         // Applies Ackermann sterring if it is enabled.
+        if(enableAckermannSteering){
+            //Steering right
+            if(steerInput > 0){
+                steerAngleLeft = Mathf.Rad2Deg * Mathf.Atan(wheelBase / (turnRadius + (rearTrack/2))) * steerInput;
+                steerAngleRight = Mathf.Rad2Deg * Mathf.Atan(wheelBase / (turnRadius - (rearTrack/2))) * steerInput;
+
+            }//Steering left            
+            else if (steerInput < 0){
+                steerAngleLeft = Mathf.Rad2Deg * Mathf.Atan(wheelBase / (turnRadius - (rearTrack/2))) * steerInput;
+                steerAngleRight = Mathf.Rad2Deg * Mathf.Atan(wheelBase / (turnRadius + (rearTrack/2))) * steerInput;
+                
+
+            } // Not steering
+            else{
+                steerAngleLeft = 0;
+                steerAngleRight = 0;
+
+            }
+            
+        }
+        // If Ackermann steering is disabled, both wheels have the same steer angle.
+        else{
+
+            steerAngleLeft = steerAngle * steerInput;
+            steerAngleRight = steerAngle * steerInput;           
+
+        }
+
+        wheelAngleLeft = Mathf.Lerp(wheelAngleLeft, steerAngleLeft, steerSpeed * Time.deltaTime);
+        wheelAngleRight = Mathf.Lerp(wheelAngleRight, steerAngleRight, steerSpeed * Time.deltaTime);
+
+        wheels[0].transform.localRotation = Quaternion.Euler(
+            wheels[0].transform.localRotation.x, 
+            wheels[0].transform.localRotation.y + wheelAngleLeft,
+            wheels[0].transform.localRotation.z );
+        
+        wheels[1].transform.localRotation = Quaternion.Euler(
+            wheels[1].transform.localRotation.x, 
+            wheels[1].transform.localRotation.y + wheelAngleRight,
+            wheels[1].transform.localRotation.z );
+
+    }
 }
