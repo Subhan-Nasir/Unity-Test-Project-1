@@ -63,6 +63,7 @@ public class no_wc_car_controller : MonoBehaviour{
     public float wheelBase = 1.5f;
     public float rearTrack = 1.085f;
     public float turnRadius = 3.14f;
+    private Vector3 steeringForce;
 
 
 
@@ -127,11 +128,21 @@ public class no_wc_car_controller : MonoBehaviour{
                 // else { // wheel is on the right of car
                 //     Fx = (wheelVelocitiesLS[i].x * springForce) * -wheels[i].transform.right; // apply force inwards
                 // }
+
+                if( i == 0){
+                    steeringForce = Quaternion.Euler(0, wheelAngleLeft, 0) * wheels[i].transform.forward * 1000;
+                }
+                else if( i == 1){
+                    steeringForce = Quaternion.Euler(0, wheelAngleRight, 0) * wheels[i].transform.forward  * 1000;
+                }
+                else{
+                    steeringForce = new Vector3 (0,0,0);
+                }
                 
 
                 
 
-                rb.AddForceAtPosition(suspensionForce + Fz, hit.point);
+                rb.AddForceAtPosition(suspensionForce + steeringForce, hit.point);
 
                              
                 
