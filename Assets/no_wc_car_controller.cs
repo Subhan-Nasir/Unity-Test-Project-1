@@ -65,20 +65,23 @@ public class no_wc_car_controller : MonoBehaviour{
     public float turnRadius = 3.14f;
     private Vector3 steeringForce;
 
-    private NewControls controls;
+    private NewControls keys;
+    private float throttle;
+    private float brake;
+    private float accel;
 
     private void Awake(){
-        controls = new NewControls();
+        keys = new NewControls();
         rb.centerOfMass = COM_Fidner.transform.localPosition;
 
     }
 
     private void OnEnable(){
-        controls.Enable();
+        keys.Enable();
     }
 
     private void OnDisable(){
-        controls.Disable();
+        keys.Disable();
     }
 
     
@@ -97,9 +100,25 @@ public class no_wc_car_controller : MonoBehaviour{
     }
 
     void Update(){
-        steerInput = controls.Track.Steering.ReadValue<float>();
+        steerInput = keys.Track.Steering.ReadValue<float>();
+        throttle = keys.Track.Throttle.ReadValue<float>();
+        brake = keys.Track.Brake.ReadValue<float>();
+
+        
+
         steerInput = Mathf.Clamp(steerInput, -1,1);
-        Debug.Log(steerInput);
+        throttle = Mathf.Clamp(throttle, 0,1);
+        brake = Mathf.Clamp(brake, 0,1);
+      
+        
+        if(throttle > brake){
+            accel = throttle;
+        }
+        else{
+            accel = -brake;
+        }
+
+        
         ApplySteering();     
 
                 
@@ -128,34 +147,29 @@ public class no_wc_car_controller : MonoBehaviour{
                 suspensionForce = f_y * hit.normal;
 
                 
-
                 wheels[i].transform.position = hit.point + hit.normal * wheelRadius;
                 wheelVelocitiesLS[i] = transform.InverseTransformDirection(rb.GetPointVelocity(hit.point));
 
-                Fz = (Input.GetAxis("Vertical") * springForce) * wheels[i].transform.forward;
+
                 
-                // if( i == 0 | i == 2){  // wheel is on the left of car
+                if(i == 2 | i == 3){
 
-                //     Fx = (wheelVelocitiesLS[i].x * springForce) * -wheels[i].transform.right; // apply force inwards
-                // }
-                // else { // wheel is on the right of car
-                //     Fx = (wheelVelocitiesLS[i].x * springForce) * -wheels[i].transform.right; // apply force inwards
-                // }
-
-                if( i == 0){
-                    steeringForce = Quaternion.Euler(0, wheelAngleLeft, 0) * wheels[i].transform.forward * 1000;
-                }
-                else if( i == 1){
-                    steeringForce = Quaternion.Euler(0, wheelAngleRight, 0) * wheels[i].transform.forward  * 1000;
+                    // Applies to rear wheels 
+                    Fz = (accel * 1000) * wheels[i].transform.forward;
                 }
                 else{
-                    steeringForce = new Vector3 (0,0,0);
-                }
+
+                    // Applis to front wheels towards the direction they are pointing
+                    Fz = (accel * 500) *  wheels[i].transform.forward;
+                } 
+                                
+                
+                
                 
 
                 
 
-                rb.AddForceAtPosition(suspensionForce + steeringForce, hit.point);
+                rb.AddForceAtPosition(suspensionForce + Fz, hit.point);
 
                              
                 

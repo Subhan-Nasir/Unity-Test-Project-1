@@ -41,6 +41,14 @@ public class @NewControls : IInputActionCollection, IDisposable
                     ""expectedControlType"": ""Axis"",
                     ""processors"": """",
                     ""interactions"": ""Press(behavior=2)""
+                },
+                {
+                    ""name"": ""AxisThrottle"",
+                    ""type"": ""Value"",
+                    ""id"": ""007f0f46-9f12-4b55-82d5-134cd8723e1a"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": ""Press(behavior=2)""
                 }
             ],
             ""bindings"": [
@@ -164,6 +172,50 @@ public class @NewControls : IInputActionCollection, IDisposable
                     ""action"": ""Steering"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""0bb70f72-4dfd-4257-8960-c521f94bbe6d"",
+                    ""path"": """",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""AxisThrottle"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""Forwards"",
+                    ""id"": ""039b43c3-0553-4483-95d6-a5ffb9c62d46"",
+                    ""path"": ""1DAxis"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""AxisThrottle"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""negative"",
+                    ""id"": ""c71edc56-96d5-4ea6-9d17-7aea7069279f"",
+                    ""path"": ""<Keyboard>/downArrow"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""AxisThrottle"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""positive"",
+                    ""id"": ""9c7f6ff6-d2fa-4219-9675-e9636df6f772"",
+                    ""path"": ""<Keyboard>/upArrow"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""AxisThrottle"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
                 }
             ]
         }
@@ -175,6 +227,7 @@ public class @NewControls : IInputActionCollection, IDisposable
         m_Track_Throttle = m_Track.FindAction("Throttle", throwIfNotFound: true);
         m_Track_Brake = m_Track.FindAction("Brake", throwIfNotFound: true);
         m_Track_Steering = m_Track.FindAction("Steering", throwIfNotFound: true);
+        m_Track_AxisThrottle = m_Track.FindAction("AxisThrottle", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -227,6 +280,7 @@ public class @NewControls : IInputActionCollection, IDisposable
     private readonly InputAction m_Track_Throttle;
     private readonly InputAction m_Track_Brake;
     private readonly InputAction m_Track_Steering;
+    private readonly InputAction m_Track_AxisThrottle;
     public struct TrackActions
     {
         private @NewControls m_Wrapper;
@@ -234,6 +288,7 @@ public class @NewControls : IInputActionCollection, IDisposable
         public InputAction @Throttle => m_Wrapper.m_Track_Throttle;
         public InputAction @Brake => m_Wrapper.m_Track_Brake;
         public InputAction @Steering => m_Wrapper.m_Track_Steering;
+        public InputAction @AxisThrottle => m_Wrapper.m_Track_AxisThrottle;
         public InputActionMap Get() { return m_Wrapper.m_Track; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -252,6 +307,9 @@ public class @NewControls : IInputActionCollection, IDisposable
                 @Steering.started -= m_Wrapper.m_TrackActionsCallbackInterface.OnSteering;
                 @Steering.performed -= m_Wrapper.m_TrackActionsCallbackInterface.OnSteering;
                 @Steering.canceled -= m_Wrapper.m_TrackActionsCallbackInterface.OnSteering;
+                @AxisThrottle.started -= m_Wrapper.m_TrackActionsCallbackInterface.OnAxisThrottle;
+                @AxisThrottle.performed -= m_Wrapper.m_TrackActionsCallbackInterface.OnAxisThrottle;
+                @AxisThrottle.canceled -= m_Wrapper.m_TrackActionsCallbackInterface.OnAxisThrottle;
             }
             m_Wrapper.m_TrackActionsCallbackInterface = instance;
             if (instance != null)
@@ -265,6 +323,9 @@ public class @NewControls : IInputActionCollection, IDisposable
                 @Steering.started += instance.OnSteering;
                 @Steering.performed += instance.OnSteering;
                 @Steering.canceled += instance.OnSteering;
+                @AxisThrottle.started += instance.OnAxisThrottle;
+                @AxisThrottle.performed += instance.OnAxisThrottle;
+                @AxisThrottle.canceled += instance.OnAxisThrottle;
             }
         }
     }
@@ -274,5 +335,6 @@ public class @NewControls : IInputActionCollection, IDisposable
         void OnThrottle(InputAction.CallbackContext context);
         void OnBrake(InputAction.CallbackContext context);
         void OnSteering(InputAction.CallbackContext context);
+        void OnAxisThrottle(InputAction.CallbackContext context);
     }
 }

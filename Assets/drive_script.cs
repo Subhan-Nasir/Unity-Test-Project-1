@@ -24,6 +24,8 @@ public class drive_script : MonoBehaviour
     public float max_torque = 200;
     public bool all_wheel_drive = true;
 
+    private float torque;
+
     [Header("Standard Steering")]
     public float max_steer_angle = 30;
 
@@ -44,9 +46,11 @@ public class drive_script : MonoBehaviour
     private float steer_angle_right;
 
     private float accel;
+
+    private float throttle;    
     private float brake;
     private float steer;
-    private float torque;
+    
 
     private Rigidbody car;
     private NewControls controls;
@@ -74,24 +78,28 @@ public class drive_script : MonoBehaviour
 
     // FixedUpdate is called once per frame
     void FixedUpdate(){
-
-        // accel = Input.GetAxis("Vertical");
-        accel = controls.Track.Throttle.ReadValue<float>();                
+        
+        throttle = controls.Track.Throttle.ReadValue<float>();        
         brake = controls.Track.Brake.ReadValue<float>();
+        steer = controls.Track.Steering.ReadValue<float>();
+
+        throttle = Mathf.Clamp(throttle, 0,1); 
+        brake = Mathf.Clamp(brake, 0,1);
+        steer = Mathf.Clamp(steer, -1,1);
+
+        Debug.Log($"Throttle input = {throttle}, Brake input = {brake}, Steering input: {steer}");
         
 
         // 0 means not pressed, 1 means fully pressed
-        accel = Mathf.Clamp(accel, 0,1); 
-        brake = Mathf.Clamp(brake, 0,1);
-
         
 
-        // steer = Input.GetAxis("Horizontal");
-        // -1 means left and +1 means right. 0 means no steering
-        steer = controls.Track.Steering.ReadValue<float>();
-        steer = Mathf.Clamp(steer, -1,1);      
+        if (throttle > brake){
+            accel = throttle;
+        }
+        else{
+            accel = -brake;
+        }
 
-        
         // Calls the function to drive the car
         drive(accel,steer);
 
@@ -100,29 +108,34 @@ public class drive_script : MonoBehaviour
     // Function to drive the the car (accerlerate/decelerate and steer)
     void drive(float accel, float steer){  
 
-        // float torque = accel*max_torque;
-        
+        torque = accel*max_torque;    
 
-        // if throttle is pressed (accel is not 0) AND brake is not pressed (brake = 0), apply forward torque
-        // else apply backwards torque for braking.
-        if (accel >= 0.1f & brake <= 0.1f){
-            torque = accel*max_torque;            
-        }
-        else if (accel == 0 & brake == 0){
-            torque = 0;
-        }
-        else{
-            torque = -brake*max_torque;
-        }
-        
-        
        
         // Apply torque to wheels based on all wheel drive or rear wheel drive
+        apply_torque_to_wheels(torque);
+        
+        // Calls the steering function to apply steering for the given input
+        apply_steering(steer);
+
+
+        // Applies force from the anti-roll bars if they are enabled.   
+        apply_anti_roll_bars(wheel_left: wheel_colliders[2], wheel_right: wheel_colliders[3]);
+
+
+        // Makes the 3D model of the wheels spin;
+        align_wheel_meshes();
+        
+
+    }
+
+
+    void apply_torque_to_wheels(float torque){
+
         if (all_wheel_drive == true){
 
             //Apply torque to all 4 wheels
             for(int i = 0; i<4; i++){
-            wheel_colliders[i].motorTorque = torque; 
+                wheel_colliders[i].motorTorque = torque;                
             }
 
         }
@@ -132,33 +145,8 @@ public class drive_script : MonoBehaviour
             wheel_colliders[2].motorTorque = torque;
             wheel_colliders[3].motorTorque = torque;
         }
-        
-        // Calls the steering function to apply steering for the given input
-        apply_steering(steer);
-
-
-        // Applies force from the anti-roll bars if they are enabled.
-        if (enable_anti_roll_bars == true){
-            WheelCollider left_wheel = wheel_colliders[2];
-            WheelCollider right_wheel = wheel_colliders[3];
-            apply_anti_roll_bars(left_wheel, right_wheel);
-        }
-
-
-        // Makes the 3D model of the wheels spin;
-        for(int i = 0; i<4; i++){        
-            
-            Quaternion q; 
-            Vector3 pos;
-            wheel_colliders[i].GetWorldPose(out pos, out q);
-            wheels[i].transform.position = pos;
-            wheels[i].transform.rotation = q;
-
-        }
-        
 
     }
-
 
     // Function for steering the car.
     void apply_steering(float steer){
@@ -194,32 +182,54 @@ public class drive_script : MonoBehaviour
     }
 
 
-
     // Function to apply forces from the anti-roll bars.
     void apply_anti_roll_bars(WheelCollider wheel_left, WheelCollider wheel_right){
+        
 
-        WheelHit hit;
-		float travelL = 1.0f;
-		float travelR = 1.0f;
+        if(enable_anti_roll_bars == true){
+
+            WheelHit hit;
+            float travelL = 1.0f;
+            float travelR = 1.0f;
 
 
-		bool groundedL = wheel_left.GetGroundHit (out hit);
-		if (groundedL) {
-			travelL = (-wheel_left.transform.InverseTransformPoint (hit.point).y - wheel_left.radius) / wheel_left.suspensionDistance;
-		}
+            bool groundedL = wheel_left.GetGroundHit (out hit);
+            if (groundedL) {
+                travelL = (-wheel_left.transform.InverseTransformPoint (hit.point).y - wheel_left.radius) / wheel_left.suspensionDistance;
+            }
 
-		bool groundedR = wheel_right.GetGroundHit (out hit);
-		if (groundedR) {
-			travelR = (-wheel_right.transform.InverseTransformPoint (hit.point).y - wheel_right.radius) / wheel_right.suspensionDistance;
-		}
+            bool groundedR = wheel_right.GetGroundHit (out hit);
+            if (groundedR) {
+                travelR = (-wheel_right.transform.InverseTransformPoint (hit.point).y - wheel_right.radius) / wheel_right.suspensionDistance;
+            }
 
-		float antiRollForce = (travelL - travelR) * AntiRoll;
+            float antiRollForce = (travelL - travelR) * AntiRoll;
 
-		if (groundedL)
-			car.AddForceAtPosition (wheel_left.transform.up * -antiRollForce, wheel_left.transform.position);
+            if (groundedL){
+                car.AddForceAtPosition (wheel_left.transform.up * -antiRollForce, wheel_left.transform.position);            
+            }
+                
 
-		if (groundedR)
-			car.AddForceAtPosition (wheel_right.transform.up * antiRollForce, wheel_right.transform.position);
+            if (groundedR){
+                car.AddForceAtPosition (wheel_right.transform.up * antiRollForce, wheel_right.transform.position);
+            }
+
+        }       
+			
 
     }
+
+    void align_wheel_meshes(){
+
+        for(int i = 0; i<4; i++){      
+            
+            Quaternion q; 
+            Vector3 pos;
+            wheel_colliders[i].GetWorldPose(out pos, out q);
+            wheels[i].transform.position = pos;
+            wheels[i].transform.rotation = q;
+
+        }
+    }
+
 }
