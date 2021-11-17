@@ -44,12 +44,25 @@ public class drive_script : MonoBehaviour
     private float steer_angle_right;
 
     private float accel;
+    private float brake;
     private float steer;
+    private float torque;
 
     private Rigidbody car;
+    private NewControls controls;
 
+    private void Awake(){
+        controls = new NewControls();
 
+    }
 
+    private void OnEnable(){
+        controls.Enable();
+    }
+
+    private void OnDisable(){
+        controls.Disable();
+    }
 
 
     // Start is called before the first frame update
@@ -62,8 +75,11 @@ public class drive_script : MonoBehaviour
     // FixedUpdate is called once per frame
     void FixedUpdate(){
 
-        accel = Input.GetAxis("Vertical");
-        accel = Mathf.Clamp(accel, -1,1);
+        // accel = Input.GetAxis("Vertical");
+        accel = controls.Track.Throttle.ReadValue<float>();
+        brake = controls.Track.Brake.ReadValue<float>();
+        accel = Mathf.Clamp(accel, 0,1);
+        brake = Mathf.Clamp(brake, 0,1);
 
         steer = Input.GetAxis("Horizontal");
         steer = Mathf.Clamp(steer, -1,1);      
@@ -77,7 +93,19 @@ public class drive_script : MonoBehaviour
     // Function to drive the the car (accerlerate/decelerate and steer)
     void drive(float accel, float steer){  
 
-        float torque = accel*max_torque;
+        // float torque = accel*max_torque;
+        
+
+        // if throttle is pressed (accel is not 0) AND brake is not pressed (brake = 0), apply forward torque
+        // else apply backwards torque for braking.
+        if (accel != 0 & brake == 0){
+            torque = accel*max_torque;            
+        }
+        else{
+            torque = -brake*max_torque;
+        }
+        
+        
        
         // Apply torque to wheels based on all wheel drive or rear wheel drive
         if (all_wheel_drive == true){
