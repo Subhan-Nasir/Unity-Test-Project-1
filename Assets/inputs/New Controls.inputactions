@@ -44,6 +44,28 @@
                 },
                 {
                     "name": "",
+                    "id": "01ac6beb-02f0-4101-bc54-d88112e28f8e",
+                    "path": "<Keyboard>/w",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Throttle",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "cc72bbbe-df2f-4242-adc4-999910344a0c",
+                    "path": "<XInputController>/rightTrigger",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Throttle",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "9c267555-4d0c-434c-8a77-04f2500bf05c",
                     "path": "<HID::obp̌pedals̞obp ped obp pedals⟥⟩⟱Ϧ>/ry",
                     "interactions": "",
@@ -55,8 +77,74 @@
                 },
                 {
                     "name": "",
+                    "id": "2131447b-f3b5-4b4d-9623-71da866a69bd",
+                    "path": "<Keyboard>/s",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Brake",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "fb3b7d49-f234-4c85-9c19-adcf807e5f83",
+                    "path": "<XInputController>/leftTrigger",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Brake",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "0809ea5e-bc2b-4652-b1fd-363a79ff2834",
                     "path": "<HID::Granite Devices Simucube 2 Pro>/z",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Steering",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "SteeringAxis",
+                    "id": "208c6df6-7153-4bbb-b037-bb62c5be44e5",
+                    "path": "1DAxis",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Steering",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "negative",
+                    "id": "fab3694b-7f5f-47b6-be6f-873dc335aef5",
+                    "path": "<Keyboard>/a",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Steering",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "positive",
+                    "id": "767efd75-b87c-4bab-802b-931bb846039f",
+                    "path": "<Keyboard>/d",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Steering",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "",
+                    "id": "5b2637f4-abe7-4d9b-9602-f2f0b9ae8ec5",
+                    "path": "<XInputController>/leftStick/x",
                     "interactions": "",
                     "processors": "",
                     "groups": "",

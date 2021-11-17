@@ -1446,7 +1446,7 @@ MonoBehaviour:
   - {fileID: 3086656793221901701}
   - {fileID: 5923094878621057109}
   - {fileID: 1800320806532371284}
-  max_torque: 400
+  max_torque: 200
   all_wheel_drive: 1
   max_steer_angle: 30
   Ackermann_Steering: 1
@@ -1454,7 +1454,7 @@ MonoBehaviour:
   rear_track: 1.085
   turn_radius: 3.14
   enable_anti_roll_bars: 1
-  AntiRoll: 10000
+  AntiRoll: 5000
 --- !u!23 &957574019366477914
 MeshRenderer:
   m_ObjectHideFlags: 0

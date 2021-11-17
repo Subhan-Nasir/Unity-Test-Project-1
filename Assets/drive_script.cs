@@ -76,12 +76,15 @@ public class drive_script : MonoBehaviour
     void FixedUpdate(){
 
         // accel = Input.GetAxis("Vertical");
-        accel = controls.Track.Throttle.ReadValue<float>();
+        accel = controls.Track.Throttle.ReadValue<float>();                
         brake = controls.Track.Brake.ReadValue<float>();
+        
 
         // 0 means not pressed, 1 means fully pressed
         accel = Mathf.Clamp(accel, 0,1); 
         brake = Mathf.Clamp(brake, 0,1);
+
+        
 
         // steer = Input.GetAxis("Horizontal");
         // -1 means left and +1 means right. 0 means no steering
@@ -102,8 +105,11 @@ public class drive_script : MonoBehaviour
 
         // if throttle is pressed (accel is not 0) AND brake is not pressed (brake = 0), apply forward torque
         // else apply backwards torque for braking.
-        if (accel != 0 & brake == 0){
+        if (accel >= 0.1f & brake <= 0.1f){
             torque = accel*max_torque;            
+        }
+        else if (accel == 0 & brake == 0){
+            torque = 0;
         }
         else{
             torque = -brake*max_torque;

@@ -65,12 +65,23 @@ public class no_wc_car_controller : MonoBehaviour{
     public float turnRadius = 3.14f;
     private Vector3 steeringForce;
 
+    private NewControls controls;
 
-
-    void Awake(){
+    private void Awake(){
+        controls = new NewControls();
         rb.centerOfMass = COM_Fidner.transform.localPosition;
 
     }
+
+    private void OnEnable(){
+        controls.Enable();
+    }
+
+    private void OnDisable(){
+        controls.Disable();
+    }
+
+    
 
     void Start(){
         
@@ -86,7 +97,9 @@ public class no_wc_car_controller : MonoBehaviour{
     }
 
     void Update(){
-        steerInput = Input.GetAxis("Horizontal");
+        steerInput = controls.Track.Steering.ReadValue<float>();
+        steerInput = Mathf.Clamp(steerInput, -1,1);
+        Debug.Log(steerInput);
         ApplySteering();     
 
                 
