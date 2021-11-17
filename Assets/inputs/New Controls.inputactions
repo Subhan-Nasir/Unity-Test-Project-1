@@ -1,0 +1,71 @@
+{
+    "name": "New Controls",
+    "maps": [
+        {
+            "name": "Track",
+            "id": "9e28a29c-91bb-44ea-bd81-987dc11783b1",
+            "actions": [
+                {
+                    "name": "Throttle",
+                    "type": "Value",
+                    "id": "b26ec5cf-4811-4907-94c0-dd28f62b92c2",
+                    "expectedControlType": "Axis",
+                    "processors": "",
+                    "interactions": "Press(behavior=2)"
+                },
+                {
+                    "name": "Brake",
+                    "type": "Value",
+                    "id": "cc3921b5-7345-448c-a739-25ed3d61f470",
+                    "expectedControlType": "Axis",
+                    "processors": "",
+                    "interactions": "Press(behavior=2)"
+                },
+                {
+                    "name": "Steering",
+                    "type": "Value",
+                    "id": "89e1f623-6a36-471d-b5e3-13d3766bd84f",
+                    "expectedControlType": "Axis",
+                    "processors": "",
+                    "interactions": "Press(behavior=2)"
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "80a10106-baa6-4f2d-b725-0e4486882e4e",
+                    "path": "<HID::obp̌pedals̞obp ped obp pedals⟥⟩⟱Ϧ>/rx",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Throttle",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "9c267555-4d0c-434c-8a77-04f2500bf05c",
+                    "path": "<HID::obp̌pedals̞obp ped obp pedals⟥⟩⟱Ϧ>/ry",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Brake",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "0809ea5e-bc2b-4652-b1fd-363a79ff2834",
+                    "path": "<HID::Granite Devices Simucube 2 Pro>/z",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Steering",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}
