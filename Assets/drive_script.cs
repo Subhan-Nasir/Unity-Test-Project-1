@@ -78,10 +78,14 @@ public class drive_script : MonoBehaviour
         // accel = Input.GetAxis("Vertical");
         accel = controls.Track.Throttle.ReadValue<float>();
         brake = controls.Track.Brake.ReadValue<float>();
-        accel = Mathf.Clamp(accel, 0,1);
+
+        // 0 means not pressed, 1 means fully pressed
+        accel = Mathf.Clamp(accel, 0,1); 
         brake = Mathf.Clamp(brake, 0,1);
 
-        steer = Input.GetAxis("Horizontal");
+        // steer = Input.GetAxis("Horizontal");
+        // -1 means left and +1 means right. 0 means no steering
+        steer = controls.Track.Steering.ReadValue<float>();
         steer = Mathf.Clamp(steer, -1,1);      
 
         
