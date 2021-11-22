@@ -40,6 +40,10 @@ public class no_wc_car_controller : MonoBehaviour{
 
     [Header("Wheel")]
     public float wheelRadius;
+    [Tooltip("Forward friction coefficient.")]
+    public float Cz = 0.8f;
+    [Tooltip("Sideways friction coefficient")]
+    public float Cx = 0.7f;
 
     private float wheel_x;
     private float wheel_y;
@@ -144,7 +148,7 @@ public class no_wc_car_controller : MonoBehaviour{
                 springForce = springStiffness * (restLength - springLength[i]);
                 damperForce = dampingCoefficient * springVelocity;
                 f_y = springForce - damperForce;
-                suspensionForce = f_y * hit.normal;
+                Fy = f_y * hit.normal;
 
                 
                 wheels[i].transform.position = hit.point + hit.normal * wheelRadius;
@@ -155,13 +159,21 @@ public class no_wc_car_controller : MonoBehaviour{
                 if(i == 2 | i == 3){
 
                     // Applies to rear wheels 
-                    Fz = (accel * 1000) * wheels[i].transform.forward;
+                    f_z = (accel * 2000) - Cz * wheelVelocitiesLS[i].z;               
+                    
+                    
                 }
                 else{
 
                     // Applis to front wheels towards the direction they are pointing
-                    Fz = (accel * 500) *  wheels[i].transform.forward;
-                } 
+                    f_z = (accel * 1000) - Cz * wheelVelocitiesLS[i].z;
+                    Debug.Log($"Fz = {f_z}");
+                }
+
+                f_x = Cx * wheelVelocitiesLS[i].x;
+
+                Fz = f_z * wheels[i].transform.forward;
+                Fx = f_x * wheels[i].transform.right; 
                                 
                 
                 
@@ -169,7 +181,7 @@ public class no_wc_car_controller : MonoBehaviour{
 
                 
 
-                rb.AddForceAtPosition(suspensionForce + Fz, hit.point);
+                rb.AddForceAtPosition(Fx + Fy + Fz, hit.point);
 
                              
                 
@@ -209,19 +221,20 @@ public class no_wc_car_controller : MonoBehaviour{
 
                       
             Gizmos.color = Color.white;
-            Gizmos.DrawSphere(springs[i].transform.position, 0.1f);
+            // Gizmos.DrawSphere(springs[i].transform.position, 0.1f);
 
             
             Gizmos.color = Color.blue;
             Ray ray = new Ray(springs[i].transform.position, -transform.up);           
             Gizmos.DrawLine(ray.origin, -springLength[i] * transform.up + springs[i].transform.position);
 
-            Gizmos.color = Color.white;
+            Gizmos.color = Color.yellow;
             Gizmos.DrawLine(-springLength[i] * transform.up + springs[i].transform.position, -springLength[i] * transform.up + springs[i].transform.position + transform.up * -wheelRadius);
-            Gizmos.DrawSphere((springs[i].transform.position) + (springLength[i]+wheelRadius)*(-transform.up),0.1f);
+            // Gizmos.DrawSphere((springs[i].transform.position) + (springLength[i]+wheelRadius)*(-transform.up),0.1f);
         
-            // Gizmos.color = Color.white;
-            // Gizmos.DrawRay(spring.transform.position, -transform.up * (maxLength + wheelRadius));
+            Gizmos.color = Color.white;
+            Gizmos.DrawRay(wheels[i].transform.position, wheels[i].transform.right * (0.5f));
+            Gizmos.DrawRay(wheels[i].transform.position, wheels[i].transform.forward * (0.5f));
         }
         
     }

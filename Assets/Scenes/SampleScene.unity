@@ -2252,9 +2252,11 @@ MonoBehaviour:
   springStiffness: 40000
   dampingCoefficient: 1000
   wheelRadius: 0.23
+  Cz: 10
+  Cx: 10
   steerAngle: 30
   steerSpeed: 10
-  enableAckermannSteering: 1
+  enableAckermannSteering: 0
   wheelBase: 1.5
   rearTrack: 1.085
   turnRadius: 3.14
