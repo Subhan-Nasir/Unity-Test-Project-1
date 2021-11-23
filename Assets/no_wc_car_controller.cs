@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using System;
 // Code adapted from: https://www.youtube.com/watch?v=x0LUiE0dxP0 
 
 public class no_wc_car_controller : MonoBehaviour{
@@ -30,9 +30,9 @@ public class no_wc_car_controller : MonoBehaviour{
     private float damperForce;
     private Vector3 suspensionForce;
 
-    private float f_x; //Sideways direction
-    private float f_y; //Upwards direction
-    private float f_z; // Forwards direction
+    private float lateral_force; //Sideways direction
+    private float vertical_force; //Upwards direction
+    private float longitudinal_force; // Forwards direction
 
     private Vector3 Fx;
     private Vector3 Fy;
@@ -49,6 +49,8 @@ public class no_wc_car_controller : MonoBehaviour{
     private float wheel_y;
     private float wheel_z;
     private Vector3[] wheelVelocitiesLS = new Vector3[4];
+    private float v;
+    private float p = 2;
 
     [Header("Steering")]
     public float steerAngle = 30f;
@@ -73,6 +75,16 @@ public class no_wc_car_controller : MonoBehaviour{
     private float throttle;
     private float brake;
     private float accel;
+
+    private float slip_angle;
+    private Vector3 slip_vector;
+    private float friction;
+
+    private float D = 4;
+    private float C = 2;
+    private float B = 30;
+    private float E = -1;
+   
 
     private void Awake(){
         keys = new NewControls();
@@ -147,33 +159,48 @@ public class no_wc_car_controller : MonoBehaviour{
 
                 springForce = springStiffness * (restLength - springLength[i]);
                 damperForce = dampingCoefficient * springVelocity;
-                f_y = springForce - damperForce;
-                Fy = f_y * hit.normal;
+                vertical_force = springForce - damperForce;
+                Fy = vertical_force * hit.normal;
 
                 
                 wheels[i].transform.position = hit.point + hit.normal * wheelRadius;
                 wheelVelocitiesLS[i] = transform.InverseTransformDirection(rb.GetPointVelocity(hit.point));
+                
+                
+                // Cz = 0.005f + (1f / p) * (0.01f + 0.0095f * Mathf.Pow(( 3.6f * wheelVelocitiesLS[i].z / 100f),2f));
+                // Cz = 100f* Cz;
+                
+                
 
+                // Applies to rear wheels
+                if(i == 2 | i == 3){
+                    longitudinal_force = (accel * (50/0.23f));
+                } 
+                
 
                 
-                if(i == 2 | i == 3){
+                
 
-                    // Applies to rear wheels 
-                    f_z = (accel * 2000) - Cz * wheelVelocitiesLS[i].z;               
-                    
-                    
-                }
-                else{
+                // Cx = 0.005f + (1f / p) * (0.01f + 0.0095f * Mathf.Pow((wheelVelocitiesLS[i].x / 100f),2f));
+                // Cx = 100f * Cz;
+                // f_x = Cx * wheelVelocitiesLS[i].x;
 
-                    // Applis to front wheels towards the direction they are pointing
-                    f_z = (accel * 1000) - Cz * wheelVelocitiesLS[i].z;
-                    Debug.Log($"Fz = {f_z}");
-                }
+                
+                // slip_angle = Vector3.Angle(rb.velocity, wheels[i].transform.forward);
+                slip_angle = Mathf.Atan(wheelVelocitiesLS[i].x/wheelVelocitiesLS[i].z);
 
-                f_x = Cx * wheelVelocitiesLS[i].x;
+                // slip_angle = Mathf.Deg2Rad * slip_angle;
+                Debug.Log($" Slip Angle = {slip_angle} Radians = {Mathf.Rad2Deg * slip_angle} degrees");
 
-                Fz = f_z * wheels[i].transform.forward;
-                Fx = f_x * wheels[i].transform.right; 
+                lateral_force = 1000* D * Mathf.Sin( C * Mathf.Atan(B * slip_angle - E * (B*slip_angle - Mathf.Atan(B * slip_angle))));
+                
+                Debug.DrawRay(wheels[i].transform.position, wheels[i].transform.right * (lateral_force));
+
+                Debug.Log($"friciton force = {lateral_force} N");
+
+                Fz = longitudinal_force * wheels[i].transform.forward;
+                // Fx = f_x * wheels[i].transform.right;           
+                
                                 
                 
                 
