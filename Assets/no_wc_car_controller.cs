@@ -30,9 +30,9 @@ public class no_wc_car_controller : MonoBehaviour{
     private float damperForce;
     private Vector3 suspensionForce;
 
-    private float lateral_force; //Sideways direction
+    private float lateralForce; //Sideways direction
     private float vertical_force; //Upwards direction
-    private float longitudinal_force; // Forwards direction
+    private float longitudinalForce; // Forwards direction
 
     private Vector3 Fx;
     private Vector3 Fy;
@@ -49,8 +49,7 @@ public class no_wc_car_controller : MonoBehaviour{
     private float wheel_y;
     private float wheel_z;
     private Vector3[] wheelVelocitiesLS = new Vector3[4];
-    private float v;
-    private float p = 2;
+
 
     [Header("Steering")]
     public float steerAngle = 30f;
@@ -76,13 +75,13 @@ public class no_wc_car_controller : MonoBehaviour{
     private float brake;
     private float accel;
 
-    private float slip_angle;
+    private float slipAngle;
     private Vector3 slip_vector;
     private float friction;
 
-    private float D = 4;
-    private float C = 2;
-    private float B = 30;
+    private float D = 1750;
+    private float C = 0.25f;
+    private float B = 10;
     private float E = -1;
    
 
@@ -160,54 +159,52 @@ public class no_wc_car_controller : MonoBehaviour{
                 springForce = springStiffness * (restLength - springLength[i]);
                 damperForce = dampingCoefficient * springVelocity;
                 vertical_force = springForce - damperForce;
+
+                // Suspension force in the vertical direction.
                 Fy = vertical_force * hit.normal;
 
                 
+                // Makes wheel's model move up and down.
                 wheels[i].transform.position = hit.point + hit.normal * wheelRadius;
+
+                // Gets local velocity of the wheel at the contact point.                
                 wheelVelocitiesLS[i] = transform.InverseTransformDirection(rb.GetPointVelocity(hit.point));
-                
-                
-                // Cz = 0.005f + (1f / p) * (0.01f + 0.0095f * Mathf.Pow(( 3.6f * wheelVelocitiesLS[i].z / 100f),2f));
-                // Cz = 100f* Cz;
-                
-                
 
-                // Applies to rear wheels
+                
+                // Calculates driving force to the wheels.
                 if(i == 2 | i == 3){
-                    longitudinal_force = (accel * (50/0.23f));
-                } 
-                
+                    longitudinalForce = (accel * (100/0.23f));
+
+                }
+                else{
+                    longitudinalForce = 0f;
+                }
 
                 
-                
-
-                // Cx = 0.005f + (1f / p) * (0.01f + 0.0095f * Mathf.Pow((wheelVelocitiesLS[i].x / 100f),2f));
-                // Cx = 100f * Cz;
-                // f_x = Cx * wheelVelocitiesLS[i].x;
 
                 
-                // slip_angle = Vector3.Angle(rb.velocity, wheels[i].transform.forward);
-                slip_angle = Mathf.Atan(wheelVelocitiesLS[i].x/wheelVelocitiesLS[i].z);
-
-                // slip_angle = Mathf.Deg2Rad * slip_angle;
-                Debug.Log($" Slip Angle = {slip_angle} Radians = {Mathf.Rad2Deg * slip_angle} degrees");
-
-                lateral_force = 1000* D * Mathf.Sin( C * Mathf.Atan(B * slip_angle - E * (B*slip_angle - Mathf.Atan(B * slip_angle))));
-                
-                Debug.DrawRay(wheels[i].transform.position, wheels[i].transform.right * (lateral_force));
-
-                Debug.Log($"friciton force = {lateral_force} N");
-
-                Fz = longitudinal_force * wheels[i].transform.forward;
-                // Fx = f_x * wheels[i].transform.right;           
-                
+                // Calculates slip angle in radians                
+                // slipAngle = Mathf.Atan(wheelVelocitiesLS[i].x/wheelVelocitiesLS[i].z);  
+                // slipAngle = Mathf.Clamp(slipAngle, -0.26f, 0.26f);
+                slipAngle = 0f;
                                 
                 
-                
-                
+ 
 
-                
+                // Debug.Log($"Front left slip anlge = {Mathf.Rad2Deg *Mathf.Atan(wheelVelocitiesLS[0].x/wheelVelocitiesLS[0].z)}");
+                // Debug.Log($"Front left lateral force = {tyreEquation(slipAngle, D, C, B, E)}");
 
+                // Calculates lateral force using the "magic equation".
+                // lateralForce = 0f * tyreEquation(slipAngle, D, C, B, E);
+                lateralForce = 0f;
+
+                Debug.Log($"Lateral force = {lateralForce} and slip angle = {Mathf.Rad2Deg * slipAngle} for wheel {i}");
+                
+                Debug.DrawRay(wheels[i].transform.position, wheels[i].transform.right * (lateralForce));
+
+                Fz = longitudinalForce * wheels[i].transform.forward;
+                Fx = lateralForce * wheels[i].transform.right;  
+                
                 rb.AddForceAtPosition(Fx + Fy + Fz, hit.point);
 
                              
@@ -229,6 +226,10 @@ public class no_wc_car_controller : MonoBehaviour{
     }
 
     
+    static float tyreEquation(float slipAngle, float D, float C, float B, float E){
+        float Force =  D * Mathf.Sin( C * Mathf.Atan(B * slipAngle) - E * ( (B*slipAngle) - Mathf.Atan(B*slipAngle)) );
+        return Force;  
+    }
     
 
 
