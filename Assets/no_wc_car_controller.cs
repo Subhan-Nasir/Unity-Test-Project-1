@@ -23,20 +23,20 @@ public class no_wc_car_controller : MonoBehaviour{
     private float minLength;
     private float maxLength;
     private float[] springLength = new float[4];
-    private float previousLength;
-    private float springVelocity;
+    private float[] previousLength = new float[4];
+    private float[] springVelocity = new float[4];
 
-    private float springForce;
-    private float damperForce;
-    private Vector3 suspensionForce;
+    private float[] springForce = new float[4];
+    private float[] damperForce = new float[4];
+    private Vector3[] suspensionForce = new Vector3[4];
 
-    private float lateralForce; //Sideways direction
-    private float vertical_force; //Upwards direction
-    private float longitudinalForce; // Forwards direction
+    private float[] lateralForce = new float[4]; //Sideways direction
+    private float[] vertical_force = new float [4]; //Upwards direction
+    private float[] longitudinalForce = new float[4]; // Forwards direction
 
-    private Vector3 Fx;
-    private Vector3 Fy;
-    private Vector3 Fz;
+    private Vector3[] Fx = new Vector3[4];
+    private Vector3[] Fy = new Vector3[4];
+    private Vector3[] Fz = new Vector3[4];
 
     [Header("Wheel")]
     public float wheelRadius;
@@ -75,11 +75,11 @@ public class no_wc_car_controller : MonoBehaviour{
     private float brake;
     private float accel;
 
-    private float slipAngle;
-    private Vector3 slip_vector;
-    private float friction;
-    private float longitudinalVelocty;
-    private float lateralVelocity;
+    private float[] slipAngle = new float[4];
+    private Vector3[] slip_vector = new Vector3[4];
+    private float[] friction = new float[4];
+    private float[] longitudinalVelocty = new float[4];
+    private float[] lateralVelocity = new float[4];
 
     private float D = 1750;
     private float C = 0.25f;
@@ -152,18 +152,18 @@ public class no_wc_car_controller : MonoBehaviour{
             bool contact = Physics.Raycast(springs[i].transform.position, -transform.up, out RaycastHit hit, maxLength + wheelRadius);
             if(contact){
 
-                previousLength = springLength[i];
+                previousLength[i] = springLength[i];
                 springLength[i] = hit.distance - wheelRadius;
                 springLength[i] = Mathf.Clamp(springLength[i], minLength, maxLength);
 
-                springVelocity = (springLength[i] - previousLength)/Time.fixedDeltaTime;
+                springVelocity[i] = (springLength[i] - previousLength[i])/Time.fixedDeltaTime;
 
-                springForce = springStiffness * (restLength - springLength[i]);
-                damperForce = dampingCoefficient * springVelocity;
-                vertical_force = springForce - damperForce;
+                springForce[i] = springStiffness * (restLength - springLength[i]);
+                damperForce[i] = dampingCoefficient * springVelocity[i];
+                vertical_force[i] = springForce[i] - damperForce[i];
 
                 // Suspension force in the vertical direction.
-                Fy = vertical_force * hit.normal;
+                Fy[i] = vertical_force[i] * hit.normal;
 
                 
                 // Makes wheel's model move up and down.
@@ -176,11 +176,11 @@ public class no_wc_car_controller : MonoBehaviour{
                 
                 // Calculates driving force to the wheels.
                 if(i == 2 | i == 3){
-                    longitudinalForce = (accel * (100/0.23f)) - 10 * longitudinalVelocty;
+                    longitudinalForce[i] = (accel * (100/0.23f)) - 10 * longitudinalVelocty[i];
 
                 }
                 else{
-                    longitudinalForce = (accel * (0/0.23f)) + 10 * longitudinalVelocty;
+                    longitudinalForce[i] = (accel * (0/0.23f)) + 10 * longitudinalVelocty[i];
                     // longitudinalForce = 0;
                 }
 
@@ -188,29 +188,29 @@ public class no_wc_car_controller : MonoBehaviour{
 
                 
                 // Calculates slip angle in radians
-                lateralVelocity = wheelVelocitiesLS[i].x;
-                longitudinalVelocty = wheelVelocitiesLS[i].z;
+                lateralVelocity[i] = wheelVelocitiesLS[i].x;
+                longitudinalVelocty[i] = wheelVelocitiesLS[i].z;
 
-                if(longitudinalVelocty < 0.2f){
-                    slipAngle = 0;
+                if(longitudinalVelocty[i] < 0.2f){
+                    slipAngle[i] = 0;
                 }
                 else{
-                    slipAngle = -Mathf.Atan(lateralVelocity/Mathf.Abs(longitudinalVelocty));
+                    slipAngle[i] = -Mathf.Atan(lateralVelocity[i]/Mathf.Abs(longitudinalVelocty[i]));
                 }
                 
                 
 
                 // Calculates lateral force using the "magic equation".                
-                lateralForce = tyreEquation(slipAngle, D, C, B, E);            
+                lateralForce[i] = tyreEquation(slipAngle[i], D, C, B, E);            
                 
-                Debug.Log($"Wheel {i}: F = {lateralForce}, Slip Angle = {Mathf.Rad2Deg * slipAngle} deg, Longitudinal velocity = {wheelVelocitiesLS[i].z}, Lateral velocty = {wheelVelocitiesLS[i].x}");
+                Debug.Log($"Wheel {i}: F = {lateralForce[i]}, Slip Angle = {Mathf.Rad2Deg * slipAngle[i]} deg, Longitudinal velocity = {wheelVelocitiesLS[i].z}, Lateral velocty = {wheelVelocitiesLS[i].x}");
                 
-                Debug.DrawRay(wheels[i].transform.position, wheels[i].transform.right * (lateralForce));
+                Debug.DrawRay(wheels[i].transform.position, wheels[i].transform.right * (lateralForce[i]));
 
-                Fz = longitudinalForce * wheels[i].transform.forward;
-                Fx = lateralForce * wheels[i].transform.right;  
+                Fz[i] = longitudinalForce[i] * wheels[i].transform.forward;
+                Fx[i] = lateralForce[i] * wheels[i].transform.right;  
                 
-                rb.AddForceAtPosition(Fx + Fy + Fz, hit.point);
+                rb.AddForceAtPosition(Fx[i] + Fy[i] + Fz[i], hit.point);
 
                              
                 
