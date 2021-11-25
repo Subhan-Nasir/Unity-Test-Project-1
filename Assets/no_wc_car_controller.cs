@@ -78,6 +78,8 @@ public class no_wc_car_controller : MonoBehaviour{
     private float slipAngle;
     private Vector3 slip_vector;
     private float friction;
+    private float longitudinalVelocty;
+    private float lateralVelocity;
 
     private float D = 1750;
     private float C = 0.25f;
@@ -174,30 +176,33 @@ public class no_wc_car_controller : MonoBehaviour{
                 
                 // Calculates driving force to the wheels.
                 if(i == 2 | i == 3){
-                    longitudinalForce = (accel * (100/0.23f));
+                    longitudinalForce = (accel * (100/0.23f)) - 10 * longitudinalVelocty;
 
                 }
                 else{
-                    longitudinalForce = 0f;
+                    longitudinalForce = (accel * (0/0.23f)) + 10 * longitudinalVelocty;
+                    // longitudinalForce = 0;
                 }
 
                 
 
                 
-                // Calculates slip angle in radians                
-                // slipAngle = -Mathf.Atan(wheelVelocitiesLS[i].x/Mathf.Abs(wheelVelocitiesLS[i].z));
-                slipAngle = -Mathf.Atan(wheelVelocitiesLS[i].x/wheelVelocitiesLS[i].z);
-                // slipAngle = Mathf.Clamp(slipAngle, -0.26f, 0.26f);
-                
-                 
+                // Calculates slip angle in radians
+                lateralVelocity = wheelVelocitiesLS[i].x;
+                longitudinalVelocty = wheelVelocitiesLS[i].z;
 
-                // Calculates lateral force using the "magic equation".
-                
-                lateralForce = tyreEquation(slipAngle, D, C, B, E);
-                
+                if(longitudinalVelocty < 0.2f){
+                    slipAngle = 0;
+                }
+                else{
+                    slipAngle = -Mathf.Atan(lateralVelocity/Mathf.Abs(longitudinalVelocty));
+                }
                 
                 
 
+                // Calculates lateral force using the "magic equation".                
+                lateralForce = tyreEquation(slipAngle, D, C, B, E);            
+                
                 Debug.Log($"Wheel {i}: F = {lateralForce}, Slip Angle = {Mathf.Rad2Deg * slipAngle} deg, Longitudinal velocity = {wheelVelocitiesLS[i].z}, Lateral velocty = {wheelVelocitiesLS[i].x}");
                 
                 Debug.DrawRay(wheels[i].transform.position, wheels[i].transform.right * (lateralForce));
@@ -243,11 +248,7 @@ public class no_wc_car_controller : MonoBehaviour{
 
             // Vector3 direction = -transform.up *(springLength[i]+wheelRadius);
             // Gizmos.DrawRay(springs[i].transform.position, direction);
-
-
-            
-
-                      
+          
             Gizmos.color = Color.white;
             // Gizmos.DrawSphere(springs[i].transform.position, 0.1f);
 
