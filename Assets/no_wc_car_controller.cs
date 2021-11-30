@@ -39,7 +39,8 @@ public class no_wc_car_controller : MonoBehaviour{
     private Vector3[] Fz = new Vector3[4];
 
     [Header("Wheel")]
-    public float wheelRadius;
+    public float wheelRadius = 0.23f;
+    public float wheelMass = 5f;
     [Tooltip("Forward friction coefficient.")]
     public float Cz = 0.8f;
     [Tooltip("Sideways friction coefficient")]
@@ -81,10 +82,12 @@ public class no_wc_car_controller : MonoBehaviour{
     private float[] longitudinalVelocty = new float[4];
     private float[] lateralVelocity = new float[4];
 
-    private float D = 1750;
-    private float C = 0.25f;
-    private float B = 10;
-    private float E = -1;
+    
+
+    private float D = 1617f;
+    private float C = 1.3915f;
+    private float B = 12.626f;
+    private float E = 0.3936f;
    
 
     private void Awake(){
@@ -150,7 +153,8 @@ public class no_wc_car_controller : MonoBehaviour{
         for(int i = 0; i<springs.Count; i++){
             
             bool contact = Physics.Raycast(springs[i].transform.position, -transform.up, out RaycastHit hit, maxLength + wheelRadius);
-            if(contact){
+            if(contact){               
+                
 
                 previousLength[i] = springLength[i];
                 springLength[i] = hit.distance - wheelRadius;
@@ -170,18 +174,20 @@ public class no_wc_car_controller : MonoBehaviour{
                 wheels[i].transform.position = hit.point + hit.normal * wheelRadius;
 
                 // Gets local velocity of the wheel at the contact point.                
-                wheelVelocitiesLS[i] = transform.InverseTransformDirection(rb.GetPointVelocity(hit.point));
+                wheelVelocitiesLS[i] = wheels[i].transform.InverseTransformDirection(rb.GetPointVelocity(hit.point));
                 
-
+ 
                 
                 // Calculates driving force to the wheels.
                 if(i == 2 | i == 3){
-                    longitudinalForce[i] = (accel * (100/0.23f)) - 10 * longitudinalVelocty[i];
+                    // longitudinalForce[i] = (accel * (100/0.23f)) - 10 * longitudinalVelocty[i];
+                    longitudinalForce[i] = (accel * (100/0.23f));
 
                 }
                 else{
-                    longitudinalForce[i] = (accel * (0/0.23f)) + 10 * longitudinalVelocty[i];
+                    // longitudinalForce[i] = (accel * (10/0.23f)) - 10 * longitudinalVelocty[i];
                     // longitudinalForce = 0;
+                    longitudinalForce[i] = (accel * (10/0.23f));
                 }
 
                 
@@ -196,19 +202,25 @@ public class no_wc_car_controller : MonoBehaviour{
                 }
                 else{
                     slipAngle[i] = -Mathf.Atan(lateralVelocity[i]/Mathf.Abs(longitudinalVelocty[i]));
-                }
-                
-                
+                    
+                }     
 
                 // Calculates lateral force using the "magic equation".                
-                lateralForce[i] = tyreEquation(slipAngle[i], D, C, B, E);            
+                lateralForce[i] = tyreEquation(slipAngle[i], D, C, B, E);
+                     
                 
                 Debug.Log($"Wheel {i}: F = {lateralForce[i]}, Slip Angle = {Mathf.Rad2Deg * slipAngle[i]} deg, Longitudinal velocity = {wheelVelocitiesLS[i].z}, Lateral velocty = {wheelVelocitiesLS[i].x}");
                 
                 Debug.DrawRay(wheels[i].transform.position, wheels[i].transform.right * (lateralForce[i]));
 
+                
+
+                Debug.DrawRay(rb.transform.position, rb.velocity);
+
                 Fz[i] = longitudinalForce[i] * wheels[i].transform.forward;
                 Fx[i] = lateralForce[i] * wheels[i].transform.right;  
+
+                
                 
                 rb.AddForceAtPosition(Fx[i] + Fy[i] + Fz[i], hit.point);
 
@@ -256,6 +268,18 @@ public class no_wc_car_controller : MonoBehaviour{
             Gizmos.color = Color.blue;
             Ray ray = new Ray(springs[i].transform.position, -transform.up);           
             Gizmos.DrawLine(ray.origin, -springLength[i] * transform.up + springs[i].transform.position);
+
+            // Gizmos.color = Color.green;
+            // if(i == 0 | i == 1){
+            //     Gizmos.DrawRay(wheels[i].transform.position, wheelVelocitiesLS[i]);
+            // }
+            
+            
+            
+
+
+
+            
 
             Gizmos.color = Color.yellow;
             Gizmos.DrawLine(-springLength[i] * transform.up + springs[i].transform.position, -springLength[i] * transform.up + springs[i].transform.position + transform.up * -wheelRadius);
