@@ -9,6 +9,7 @@ public class no_wc_car_controller : MonoBehaviour{
 
     public List<GameObject> springs;
     public List<GameObject> wheels;
+    public List<GameObject> meshes;
 
 
     [Header("Centre of mass")]    
@@ -30,30 +31,35 @@ public class no_wc_car_controller : MonoBehaviour{
     private float[] damperForce = new float[4];
     private Vector3[] suspensionForce = new Vector3[4];
 
-    private float[] lateralForce = new float[4]; //Sideways direction
-    private float[] vertical_force = new float [4]; //Upwards direction
-    private float[] longitudinalForce = new float[4]; // Forwards direction
+    
 
-    private Vector3[] Fx = new Vector3[4];
-    private Vector3[] Fy = new Vector3[4];
-    private Vector3[] Fz = new Vector3[4];
+    
 
     [Header("Wheel")]
     public float wheelRadius = 0.23f;
-    public float wheelMass = 5f;
-    [Tooltip("Forward friction coefficient.")]
-    public float Cz = 0.8f;
-    [Tooltip("Sideways friction coefficient")]
-    public float Cx = 0.7f;
+    public float wheelMass = 0.1f;    
 
     private float wheel_x;
     private float wheel_y;
     private float wheel_z;
     private Vector3[] wheelVelocitiesLS = new Vector3[4];
 
+    private Vector3[] Fx = new Vector3[4];
+    private Vector3[] Fy = new Vector3[4];
+    private Vector3[] Fz = new Vector3[4];
+
+    private float[] slipAngle = new float[4];
+    private Vector3[] slip_vector = new Vector3[4];
+    private float[] friction = new float[4];
+    private float[] longitudinalVelocty = new float[4];
+    private float[] lateralVelocity = new float[4];
+
+    private float[] lateralForce = new float[4]; //Sideways direction
+    private float[] vertical_force = new float [4]; //Upwards direction
+    private float[] longitudinalForce = new float[4]; // Forwards direction
 
     [Header("Steering")]
-    public float steerAngle = 30f;
+    public float steerAngle = 20f;
     public float steerSpeed = 10f;
 
     
@@ -76,19 +82,16 @@ public class no_wc_car_controller : MonoBehaviour{
     private float brake;
     private float accel;
 
-    private float[] slipAngle = new float[4];
-    private Vector3[] slip_vector = new Vector3[4];
-    private float[] friction = new float[4];
-    private float[] longitudinalVelocty = new float[4];
-    private float[] lateralVelocity = new float[4];
-
-    
-
     private float D = 1617f;
     private float C = 1.3915f;
     private float B = 12.626f;
     private float E = 0.3936f;
    
+
+
+   private float[] alpha = new float[4];
+   private float[] omega = new float[4];
+   private float[] theta = new float[4];
 
     private void Awake(){
         keys = new NewControls();
@@ -155,6 +158,16 @@ public class no_wc_car_controller : MonoBehaviour{
             bool contact = Physics.Raycast(springs[i].transform.position, -transform.up, out RaycastHit hit, maxLength + wheelRadius);
             if(contact){               
                 
+                // Making the wheels spin
+                alpha[i] = (longitudinalForce[i] * wheelRadius) / (0.5f * wheelMass * Mathf.Pow(wheelRadius, 2f));
+                omega[i] = omega[i] + alpha[i] * Time.deltaTime;
+                theta[i] = theta[i] + omega[i] * Time.deltaTime;
+
+                meshes[i].transform.Rotate(Mathf.Rad2Deg * omega[i] * Time.deltaTime, 0,0);
+                
+                
+
+
 
                 previousLength[i] = springLength[i];
                 springLength[i] = hit.distance - wheelRadius;
@@ -211,7 +224,7 @@ public class no_wc_car_controller : MonoBehaviour{
                 
                 Debug.Log($"Wheel {i}: F = {lateralForce[i]}, Slip Angle = {Mathf.Rad2Deg * slipAngle[i]} deg, Longitudinal velocity = {wheelVelocitiesLS[i].z}, Lateral velocty = {wheelVelocitiesLS[i].x}");
                 
-                Debug.DrawRay(wheels[i].transform.position, wheels[i].transform.right * (lateralForce[i]));
+                // Debug.DrawRay(wheels[i].transform.position, wheels[i].transform.right * (lateralForce[i]));
 
                 
 
@@ -223,6 +236,8 @@ public class no_wc_car_controller : MonoBehaviour{
                 
                 
                 rb.AddForceAtPosition(Fx[i] + Fy[i] + Fz[i], hit.point);
+
+                
 
                              
                 
