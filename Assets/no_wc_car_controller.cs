@@ -11,7 +11,8 @@ public class no_wc_car_controller : MonoBehaviour{
     public List<GameObject> wheels;
     public List<GameObject> meshes;
 
-
+    
+    
     [Header("Centre of mass")]    
     public GameObject COM_Fidner;
 
@@ -167,8 +168,6 @@ public class no_wc_car_controller : MonoBehaviour{
                 
                 
 
-
-
                 previousLength[i] = springLength[i];
                 springLength[i] = hit.distance - wheelRadius;
                 springLength[i] = Mathf.Clamp(springLength[i], minLength, maxLength);
@@ -288,12 +287,6 @@ public class no_wc_car_controller : MonoBehaviour{
             // if(i == 0 | i == 1){
             //     Gizmos.DrawRay(wheels[i].transform.position, wheelVelocitiesLS[i]);
             // }
-            
-            
-            
-
-
-
             
 
             Gizmos.color = Color.yellow;
