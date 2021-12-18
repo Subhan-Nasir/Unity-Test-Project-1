@@ -16,15 +16,16 @@ public class RaycastController : MonoBehaviour{
     [Header("Centre of mass")]    
     public GameObject COM_Fidner;
 
-    [Header("Suspension")]
+    [Header("Suspension Settings")]
     public float restLength;
     public float springTravel;
     public float springStiffness;
-    public float dampingCoefficient;
-  
+    public float dampingCoefficient; 
+    
+    
     private Suspension[] suspensions = new Suspension[4];
     
-    
+
 
     [Header("Wheel")]
     public float wheelRadius = 0.23f;
@@ -66,24 +67,30 @@ public class RaycastController : MonoBehaviour{
     private float accel;
 
 
-    private void Awake(){
+    void OnValidate(){
         keys = new NewControls();
-        rb.centerOfMass = COM_Fidner.transform.localPosition;
-
+        rb.centerOfMass = COM_Fidner.transform.localPosition;     
+                           
+        
         for (int i = 0; i < 4; i++){
-            suspensions[i] = new Suspension(i, restLength, springTravel, springStiffness, dampingCoefficient, wheelRadius);
+            suspensions[i] = new Suspension(i, restLength, springTravel, springStiffness, dampingCoefficient, wheelRadius);                     
             wheels[i] = new Wheel(i, wheelObjects[i], rb, wheelRadius, wheelMass, D, C, B, E);
+            
         }
+        
                 
     }
 
     
 
-    private void OnEnable(){
+    void OnEnable(){
+        
         keys.Enable();
+        
+        
     }
 
-    private void OnDisable(){
+    void OnDisable(){
         keys.Disable();
     }
 
@@ -91,6 +98,9 @@ public class RaycastController : MonoBehaviour{
 
     void Start(){
         //
+
+        
+        
     }
 
     void Update(){
@@ -117,10 +127,11 @@ public class RaycastController : MonoBehaviour{
     }
 
     void FixedUpdate(){
+        
  
         for(int i = 0; i<springs.Count; i++){    
 
-            bool contact = Physics.Raycast(springs[i].transform.position, -transform.up, out RaycastHit hit, restLength + springTravel + wheelRadius);
+            bool contact = Physics.Raycast(springs[i].transform.position, -transform.up, out RaycastHit hit, 0.6f + 0.35f + wheelRadius);
 
             if(contact){            
                 
@@ -138,47 +149,31 @@ public class RaycastController : MonoBehaviour{
     }
     
 
-    // void OnDrawGizmosSelected(){
+    void OnDrawGizmos(){
 
-    //     Gizmos.color = Color.white;
-    //     Gizmos.DrawWireSphere( transform.TransformPoint(rb.centerOfMass),0.2f);
-
-    //     for(int i = 0; i < springs.Count; i++){
+        Gizmos.color = Color.white;
+        Gizmos.DrawWireSphere( transform.TransformPoint(rb.centerOfMass),0.2f);
         
-
-    //         // Vector3 direction = -transform.up *(springLength[i]+wheelRadius);
-    //         // Gizmos.DrawRay(springs[i].transform.position, direction);
-          
-    //         Gizmos.color = Color.white;
-    //         // Gizmos.DrawSphere(springs[i].transform.position, 0.1f);
-
-            
-    //         Gizmos.color = Color.blue;
-    //         Ray ray = new Ray(springs[i].transform.position, -transform.up);           
-    //         Gizmos.DrawLine(ray.origin, -suspensions[i].springLength * transform.up + springs[i].transform.position);
-
-    //         // Gizmos.color = Color.green;
-    //         // if(i == 0 | i == 1){
-    //         //     Gizmos.DrawRay(wheels[i].transform.position, wheelVelocitiesLS[i]);
-    //         // }
-            
-            
-            
-
-
-
-            
-
-    //         Gizmos.color = Color.yellow;
-    //         Gizmos.DrawLine(-springLength[i] * transform.up + springs[i].transform.position, -springLength[i] * transform.up + springs[i].transform.position + transform.up * -wheelRadius);
-    //         // Gizmos.DrawSphere((springs[i].transform.position) + (springLength[i]+wheelRadius)*(-transform.up),0.1f);
+        for(int i = 0; i < springs.Count; i++){
         
-    //         Gizmos.color = Color.white;
-    //         Gizmos.DrawRay(wheels[i].transform.position, wheels[i].transform.right * (0.5f));
-    //         Gizmos.DrawRay(wheels[i].transform.position, wheels[i].transform.forward * (0.5f));
-    //     }
+                        
+            Gizmos.color = Color.blue;
+            Ray ray = new Ray(springs[i].transform.position, -transform.up);           
+            Gizmos.DrawLine(ray.origin, -suspensions[i].springLength * transform.up + springs[i].transform.position);
+
+            
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawLine(-suspensions[i].springLength * transform.up + springs[i].transform.position, -suspensions[i].springLength * transform.up + springs[i].transform.position + transform.up * -wheelRadius);
+            
         
-    // }
+            Gizmos.color = Color.white;
+            Gizmos.DrawRay(wheels[i].wheelObject.transform.position, wheels[i].wheelObject.transform.right * (0.5f));
+            Gizmos.DrawRay(wheels[0].wheelObject.transform.position, wheels[0].wheelObject.transform.forward * (0.5f));
+            
+            
+        }
+        
+    }
 
     void ApplySteering(){
 
@@ -235,142 +230,7 @@ public class RaycastController : MonoBehaviour{
     public Wheel[] getWheels(){
         return wheels;
     }
-    
-
-
-    // Classes used
-    public class Suspension{
-
-        public float id;
-        public float restLength;
-        public float springTravel;
-        public float springStiffness;
-        public float dampingCoefficient;
-        public float wheelRadius;
-        
-        public float minLength;
-        public float maxLength;
-        public float springLength;
-        public float previousLength;
-        public float springVelocity;
-
-        public float springForce;
-        public float damperForce;
-        public Vector3 force = new Vector3();
-
-        public Suspension(float id, float restLength, float springTravel, float springStiffness, float dampingCoefficient, float wheelRadius){
-            this.id = id;
-            this.restLength = restLength;
-            this.springTravel = springTravel;
-            this.springStiffness = springStiffness;
-            this.dampingCoefficient = dampingCoefficient;
-            this.wheelRadius = wheelRadius;
-
-            this.minLength = restLength - springTravel;
-            this.maxLength = restLength + springTravel;
-            this.springLength = restLength;
-            this.previousLength = restLength;
-            
-
-        }
-
-        public Vector3 getUpdatedForce(RaycastHit hit, float timeDelta){
-            previousLength = springLength;
-            springLength = hit.distance - wheelRadius;
-            springLength = Mathf.Clamp(springLength, minLength, maxLength);
-            springVelocity = (springLength - previousLength)/timeDelta;
-            springForce = springStiffness * (restLength - springLength);
-            damperForce = dampingCoefficient * springVelocity;
-            force = (springForce - damperForce) * hit.normal;
-            
-            
-            return force;
-
-        }
-
-
-
-    }
-
-    public class Wheel{
-
-    public float id;
-    public GameObject wheelObject;
-    public Rigidbody rb;
-    public float wheelRadius;
-    public float wheelMass;  
-
-
-    public float slipAngle;
-    public Vector3 wheelVelocityLS;        
-    public float longitudinalVelocty;
-    public float lateralVelocity;
-
-    public float lateralForce; //Sideways direction
-    public float vertical_force; //Upwards direction
-    public float longitudinalForce; // Forwards direction
-    public Vector3 forceVector;
-
-    public float D;
-    public float C;
-    public float B;
-    public float E;
-
-    public Wheel(float id, GameObject wheelObject, Rigidbody rb, float wheelRadius, float wheelMass, float D, float C, float B, float E){
-        this.id = id;
-        this.wheelObject = wheelObject;
-        this.rb = rb;
-        this.wheelRadius = wheelRadius;
-        this.wheelMass = wheelMass;
-
-        this.D = D;
-        this.C = C;
-        this.B = B; 
-        this.E = E;      
-
-    }
-
-    public float tyreEquation(float slip, float D, float C, float B, float E){
-        float force = D * Mathf.Sin( C * Mathf.Atan(B * slip - E * ( (B*slip) - Mathf.Atan(B*slip))));
-        return force;  
-    }
-
-    public Vector3 getUpdatedForce(float accel, RaycastHit hit){
-
-        wheelObject.transform.position = hit.point + hit.normal * wheelRadius;
-
-        wheelVelocityLS = wheelObject.transform.InverseTransformDirection(rb.GetPointVelocity(hit.point));
-
-        lateralVelocity = wheelVelocityLS.x;
-        longitudinalVelocty = wheelVelocityLS.z;
-                
-        
-        if(longitudinalVelocty < 0.2f){
-            slipAngle = 0;
-        }
-        else{
-            slipAngle = -Mathf.Atan(lateralVelocity / Mathf.Abs(longitudinalVelocty));
-            
-        }
-
-        // Calculates driving force to the wheels.
-        if(id == 2 | id == 3){            
-            longitudinalForce = (accel * (100/0.23f));
-        }
-        else{            
-            longitudinalForce = (accel * (10/0.23f));
-        }     
-
-        lateralForce = tyreEquation(slipAngle, D, C, B, E);
-        forceVector = longitudinalForce * wheelObject.transform.forward + lateralForce * wheelObject.transform.right;
-
-        return forceVector;
-
-
-    }
-
-
-}
+   
     
 }
 
