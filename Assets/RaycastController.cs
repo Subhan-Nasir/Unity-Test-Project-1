@@ -74,7 +74,7 @@ public class RaycastController : MonoBehaviour{
         
         for (int i = 0; i < 4; i++){
             suspensions[i] = new Suspension(i, restLength, springTravel, springStiffness, dampingCoefficient, wheelRadius);                     
-            wheels[i] = new Wheel(i, wheelObjects[i], rb, wheelRadius, wheelMass, D, C, B, E);
+            wheels[i] = new Wheel(i, wheelObjects[i], meshes[i], rb, wheelRadius, wheelMass, D, C, B, E);
             
         }
         
@@ -137,7 +137,7 @@ public class RaycastController : MonoBehaviour{
                 
                 // Suspension force in the vertical direction.
                 Vector3 suspensionForceVector = suspensions[i].getUpdatedForce(hit, Time.fixedDeltaTime);
-                Vector3 wheelForceVector = wheels[i].getUpdatedForce(accel, hit);            
+                Vector3 wheelForceVector = wheels[i].getUpdatedForce(accel, hit, Time.fixedDeltaTime);            
                                 
                 rb.AddForceAtPosition(wheelForceVector + suspensionForceVector, hit.point); 
 
