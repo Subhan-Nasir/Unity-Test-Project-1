@@ -23,15 +23,23 @@ public class Wheel{
     public float longitudinalForce; // Forwards direction
     public Vector3 forceVector;
 
-    public float D;
-    public float C;
-    public float B;
-    public float E;
+    public float D_long;
+    public float C_long;
+    public float B_long;
+    public float E_long;
+    public float c_long;
+    public float m_long;
+
+    public float D_lat;
+    public float C_lat;
+    public float B_lat;
+    public float E_lat;
+
 
     public float alpha;
     public float omega;
 
-    public Wheel(float id, GameObject wheelObject, GameObject wheelMesh, Rigidbody rb, float wheelRadius, float wheelMass, float D, float C, float B, float E){
+    public Wheel(float id, GameObject wheelObject, GameObject wheelMesh, Rigidbody rb, float wheelRadius, float wheelMass, float[] longitudinalConstants, float[] lateralConstants){
         this.id = id;
         this.wheelObject = wheelObject;
         this.wheelMesh = wheelMesh;
@@ -39,10 +47,19 @@ public class Wheel{
         this.wheelRadius = wheelRadius;
         this.wheelMass = wheelMass;
 
-        this.D = D;
-        this.C = C;
-        this.B = B; 
-        this.E = E;      
+        this.D_long = longitudinalConstants[0];
+        this.C_long = longitudinalConstants[1];
+        this.B_long = longitudinalConstants[2];
+        this.E_long = longitudinalConstants[3];
+        this.c_long = longitudinalConstants[4];
+        this.m_long = longitudinalConstants[5];
+
+
+        this.D_lat = lateralConstants[0];
+        this.C_lat = lateralConstants[1];
+        this.B_lat = lateralConstants[2];
+        this.E_lat = lateralConstants[3];
+              
 
     }
 
@@ -51,7 +68,15 @@ public class Wheel{
         return force;  
     }
 
-    public Vector3 getUpdatedForce(float accel, RaycastHit hit, float timeDelta){
+    public float complexTyreEquation(float slip, float verticalLoad, float D, float C, float B, float E, float c, float m){
+
+        float force = (c*verticalLoad - m*Mathf.Pow(verticalLoad, 2)) * (D * Mathf.Sin( C * Mathf.Atan(B * slip - E * ( (B*slip) - Mathf.Atan(B*slip)))));
+        return force;
+
+
+    }
+
+    public Vector3 getUpdatedForce(float accel, RaycastHit hit, float timeDelta, float verticalLoad){
 
         wheelObject.transform.position = hit.point + hit.normal * wheelRadius;
 
@@ -69,19 +94,14 @@ public class Wheel{
             
         }
 
-        // Calculates driving force to the wheels.
-        // if(id == 2 | id == 3){            
-        //     longitudinalForce = (accel * (100/0.23f));
-        // }
-        // else{            
-        //     longitudinalForce = (accel * (10/0.23f));
-        // }
+        
 
         if(id == 2 | id == 3){
             alpha = (accel * 100) * wheelRadius / 0.5f * wheelMass * Mathf.Pow(wheelRadius, 2);
             omega += alpha * timeDelta;            
-            slipRatio = (longitudinalVelocty - omega * wheelRadius)/(omega * wheelRadius);
-            longitudinalForce =  -tyreEquation(slipRatio, D, C, B, E);
+            slipRatio = (longitudinalVelocty - omega * wheelRadius)/Mathf.Abs(omega * wheelRadius);
+            // longitudinalForce =  -tyreEquation(slipRatio, D_long, C_long, B_long, E_long);
+            longitudinalForce = -complexTyreEquation(slipRatio, verticalLoad, D_long, C_long, B_long, E_long, c_long, m_long);
 
             if(float.IsNaN(longitudinalForce)){
                 longitudinalForce = 0;
@@ -93,9 +113,11 @@ public class Wheel{
 
         }
 
+        // Debug.Log($"wheel id = {id}: Force multiplier = {c_long*verticalLoad - m_long*Mathf.Pow(verticalLoad, 2)}");
+        Debug.Log($"Wheel id = {id}: Longitudinal Force = {longitudinalForce}, Vertical Load = {verticalLoad}");
         wheelMesh.transform.Rotate(Mathf.Rad2Deg * omega * timeDelta, 0, 0, Space.Self);     
 
-        lateralForce = tyreEquation(slipAngle, D, C, B, E);
+        lateralForce = tyreEquation(slipAngle, D_lat, C_lat, B_lat, E_lat);
         forceVector = longitudinalForce * wheelObject.transform.forward + lateralForce * wheelObject.transform.right;
 
         return forceVector;

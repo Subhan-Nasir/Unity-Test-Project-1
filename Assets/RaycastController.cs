@@ -31,11 +31,21 @@ public class RaycastController : MonoBehaviour{
     public float wheelRadius = 0.23f;
     public float wheelMass = 0.1f;    
 
-    private float D = 1617f;
-    private float C = 1.3915f;
-    private float B = 12.626f;
-    private float E = 0.3936f;
-    
+        
+    // Order of constants >>> D, C, B, E, c, m
+    // New
+    // private float[] longitudinalConstants = new float[]{1502, 0.1879f, 17.74f, 1.137f, 0.01305f, 2.173E-6f};
+    // private float[] lateralConstants = new float[]{1596, 1.5f, 12, 0.4f};
+
+    // Old
+    // private float[] longitudinalConstants = new float[]{1617, 1.3915f, 12.626f, 0.3936f, 0.01305f, 2.173E-6f};
+    // private float[] lateralConstants = new float[]{1617, 1.3915f, 12.626f, 0.3936f};
+
+    // One at a time
+    private float[] longitudinalConstants = new float[]{1502, 0.1879f, 17.74f, 1f, 0.01305f, 2.173E-6f};
+    private float[] lateralConstants = new float[]{1617, 1.3915f, 12.626f, 0.3936f};
+
+
     
     private Wheel[] wheels = new Wheel[4];
 
@@ -66,6 +76,9 @@ public class RaycastController : MonoBehaviour{
     private float brake;
     private float accel;
 
+    private float theTime = 0f;
+    private bool timerOn = false;
+    private bool speedReached = false;
 
     void OnValidate(){
         keys = new NewControls();
@@ -74,7 +87,7 @@ public class RaycastController : MonoBehaviour{
         
         for (int i = 0; i < 4; i++){
             suspensions[i] = new Suspension(i, restLength, springTravel, springStiffness, dampingCoefficient, wheelRadius);                     
-            wheels[i] = new Wheel(i, wheelObjects[i], meshes[i], rb, wheelRadius, wheelMass, D, C, B, E);
+            wheels[i] = new Wheel(i, wheelObjects[i], meshes[i], rb, wheelRadius, wheelMass, longitudinalConstants, lateralConstants);
             
         }
         
@@ -137,7 +150,7 @@ public class RaycastController : MonoBehaviour{
                 
                 // Suspension force in the vertical direction.
                 Vector3 suspensionForceVector = suspensions[i].getUpdatedForce(hit, Time.fixedDeltaTime);
-                Vector3 wheelForceVector = wheels[i].getUpdatedForce(accel, hit, Time.fixedDeltaTime);            
+                Vector3 wheelForceVector = wheels[i].getUpdatedForce(accel, hit, Time.fixedDeltaTime, suspensionForceVector.magnitude);            
                                 
                 rb.AddForceAtPosition(wheelForceVector + suspensionForceVector, hit.point); 
 
@@ -146,6 +159,22 @@ public class RaycastController : MonoBehaviour{
 
             }
         }
+
+        float carSpeed = rb.velocity.z;
+        if(carSpeed > 0 & speedReached == false){
+            timerOn = true;
+        }
+
+        if(timerOn == true){
+            theTime += Time.fixedDeltaTime;
+            
+            if(carSpeed >= 26.8f){
+                speedReached = true;
+                timerOn = false;
+            }
+        }
+        Debug.Log($"Timer = {theTime}");
+
     }
     
 
@@ -170,6 +199,7 @@ public class RaycastController : MonoBehaviour{
             Gizmos.DrawRay(wheels[i].wheelObject.transform.position, wheels[i].wheelObject.transform.right * (0.5f));
             Gizmos.DrawRay(wheels[0].wheelObject.transform.position, wheels[0].wheelObject.transform.forward * (0.5f));
             
+
             
         }
         
