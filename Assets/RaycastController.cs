@@ -42,9 +42,27 @@ public class RaycastController : MonoBehaviour{
     // private float[] lateralConstants = new float[]{1617, 1.3915f, 12.626f, 0.3936f};
 
     // One at a time
-    private float[] longitudinalConstants = new float[]{1502, 0.1879f, 17.74f, 1f, 0.01305f, 2.173E-6f};
-    private float[] lateralConstants = new float[]{1617, 1.3915f, 12.626f, 0.3936f};
+    // private float[] longitudinalConstants = new float[]{1502, 0.1879f, 17.74f, 1f, 0.01305f, 2.173E-6f};
+    // private float[] lateralConstants = new float[]{1617, 1.3915f, 12.626f, 0.3936f};
 
+    private Dictionary<string, float> lateralConstants = new Dictionary<string,float>(){
+        {"B", 11.45f},
+        {"C", 1.551f},
+        {"D", 1790},
+        {"E", 0.1859f},
+        {"c", 0.00151f},
+        {"m", 2.533E-7f}
+    };
+
+    private Dictionary<string, float> longitudinalConstants = new Dictionary<string, float>(){
+        {"B", 11.95f},
+        {"C", 1.515f},
+        {"D", 1609},
+        {"E", 0.01497f},
+        {"c", 0.001926f},
+        {"m", 4.03E-7f}     
+    };
+    
 
     
     private Wheel[] wheels = new Wheel[4];
@@ -173,7 +191,7 @@ public class RaycastController : MonoBehaviour{
                 timerOn = false;
             }
         }
-        Debug.Log($"Timer = {theTime}");
+        // Debug.Log($"Timer = {theTime}");
 
     }
     
@@ -197,7 +215,7 @@ public class RaycastController : MonoBehaviour{
         
             Gizmos.color = Color.white;
             Gizmos.DrawRay(wheels[i].wheelObject.transform.position, wheels[i].wheelObject.transform.right * (0.5f));
-            Gizmos.DrawRay(wheels[0].wheelObject.transform.position, wheels[0].wheelObject.transform.forward * (0.5f));
+            Gizmos.DrawRay(wheels[i].wheelObject.transform.position, wheels[i].wheelObject.transform.forward * (0.5f));
             
 
             
