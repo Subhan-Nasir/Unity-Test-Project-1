@@ -1788,7 +1788,7 @@ MonoBehaviour:
   COM_Fidner: {fileID: 490260644}
   restLength: 0.6
   springTravel: 0.35
-  springStiffness: 40000
+  springStiffness: 20000
   dampingCoefficient: 1000
   wheelRadius: 0.23
   wheelMass: 5
