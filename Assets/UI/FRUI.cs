@@ -32,7 +32,7 @@ public class FRUI : MonoBehaviour{
         }  
 
         if (torqueLabel != null){
-            torqueLabel.text = (0.5f*Mathf.Pow(wheelsList[i].wheelRadius,2)*wheelsList[i].wheelMass*wheelsList[i].alpha/(wheelsList[i].wheelRadius)).ToString();
+            torqueLabel.text = wheelsList[i].torque.ToString();
         }  
 
         if (forceLabel != null){
@@ -40,11 +40,11 @@ public class FRUI : MonoBehaviour{
         }  
 
         if (slipLabel != null){
-            slipLabel.text = "(" + Math.Round(wheelsList[i].slipAngle,2).ToString()+ ","+ Math.Round(wheelsList[i].slipRatio,2).ToString()+")";
+            slipLabel.text = "(" + Math.Round(Mathf.Rad2Deg*wheelsList[i].slipAngle,2).ToString()+ ","+ Math.Round(wheelsList[i].slipRatio,2).ToString()+")";
         }     
 
         if (omegaLabel != null){
-            omegaLabel.text = Math.Round(wheelsList[i].omega,2).ToString();
+            omegaLabel.text = Math.Round(Mathf.Rad2Deg*wheelsList[i].omega,2).ToString();
         }          
      
     }

@@ -20,6 +20,7 @@ public class Wheel{
     public Vector3 wheelVelocityLS;        
     public float longitudinalVelocty;
     public float lateralVelocity;
+    public float torque;
 
     public float lateralForce; //Sideways direction
     public float vertical_force; //Upwards direction
@@ -135,7 +136,8 @@ public class Wheel{
         fLatDynamicLimit = dynamicPeakLateral(longitudinalForce, fLongLimit, fLatLimit);
 
         if(id == 2 | id == 3){
-            alpha = (accel * 100) * wheelRadius / 0.5f * wheelMass * Mathf.Pow(wheelRadius, 2);
+            torque= (accel * 100);
+            alpha = torque/ 0.5f * wheelMass * Mathf.Pow(wheelRadius, 2);
             omega += alpha * timeDelta;            
             slipRatio = (longitudinalVelocty - omega * wheelRadius)/Mathf.Abs(omega * wheelRadius);
             // longitudinalForce =  -tyreEquation(slipRatio, D_long, C_long, B_long, E_long);
