@@ -20,6 +20,9 @@ public class Wheel{
     public Vector3 wheelVelocityLS;        
     public float longitudinalVelocty;
     public float lateralVelocity;
+    public float wheelTorque;
+    public float engineTorque;
+    public float brakingTorque;
     public float torque;
 
     public float lateralForce; //Sideways direction
@@ -120,7 +123,7 @@ public class Wheel{
         longitudinalVelocty = wheelVelocityLS.z;
                 
         
-        if(Mathf.Abs(longitudinalVelocty) < 0.0001f){
+        if(Mathf.Abs(longitudinalVelocty) < 0.5f){
             slipAngle = 0;
         }
         else{
@@ -135,83 +138,69 @@ public class Wheel{
         fLongDynamicLimit = dynamicPeakLongitudinal(lateralForce, fLongLimit, fLatLimit);
         fLatDynamicLimit = dynamicPeakLateral(longitudinalForce, fLongLimit, fLatLimit);
 
-        if(id == 2 | id == 3){
-            torque= (accel * 100);
-            alpha = torque/ 0.5f * wheelMass * Mathf.Pow(wheelRadius, 2);
-            omega += alpha * timeDelta;            
+        if(accel == 0){
+            wheelTorque = -(verticalLoad * omega*wheelRadius * 0.00003f);
+            torque = wheelTorque;
             slipRatio = (longitudinalVelocty - omega * wheelRadius)/Mathf.Abs(omega * wheelRadius);
-            // longitudinalForce =  -tyreEquation(slipRatio, D_long, C_long, B_long, E_long);
-            longitudinalForce = -complexTyreEquation(slipRatio, fLongDynamicLimit, C_long, B_long, E_long);
 
-            if(float.IsNaN(longitudinalForce)){
-                longitudinalForce = 0;
+        }
+        else if(accel > 0){
+
+            if(id == 2 | id == 3){
+                engineTorque = accel * 10;
+                
+                slipRatio = (longitudinalVelocty - omega * wheelRadius)/Mathf.Abs(omega * wheelRadius);
+            }
+            else{
+                engineTorque = 0;
+                
             }
 
-        }
-        else{
-            omega = longitudinalVelocty / wheelRadius;
+            torque = engineTorque;
 
         }
+        else if(accel < 0 ){
+            if(omega > 0){
+                brakingTorque = 20* longitudinalVelocty;
+            }
+            else{
+                brakingTorque = 0;
+            }
+            if(id == 2 | id == 3){
+                omega = longitudinalVelocty/wheelRadius;
+            }
+            torque = -brakingTorque;
+            slipRatio = (longitudinalVelocty - omega * wheelRadius)/Mathf.Abs(omega * wheelRadius);
 
+        }
 
-        // // FOR BRAKING
-        // if( accel < 0  & omega > 0){
-        //     alpha = (accel * 250) * wheelRadius / 0.5f * wheelMass * Mathf.Pow(wheelRadius, 2);
-        //     omega += alpha * timeDelta;  
-        //     omega = Mathf.Clamp(omega, 0, 1000000);
-        
-        //     if(longitudinalVelocty > omega * wheelRadius){
-        //         slipRatio = (omega * wheelRadius - longitudinalVelocty)/Mathf.Abs(longitudinalVelocty);               
-
-        //     }     
-        //     else if (longitudinalVelocty <= omega * wheelRadius){
-        //         slipRatio = 0;
-        //     }
-            
-
-
-        //     // longitudinalForce =  -tyreEquation(slipRatio, D_long, C_long, B_long, E_long);
-        //     longitudinalForce = complexTyreEquation(slipRatio, fLongDynamicLimit, C_long, B_long, E_long);
-
+        alpha = torque / (0.5f * wheelMass * Mathf.Pow(wheelRadius, 2));
+        if(id == 0 | id == 1){
+            omega = longitudinalVelocty/wheelRadius;
+        }
+       
+        omega += alpha * timeDelta;
+        // if(longitudinalVelocty > omega*wheelRadius){
+        //     slipRatio = (omega*wheelRadius-longitudinalVelocty)/(longitudinalVelocty);
         // }
-        // else if(accel < 0 & (longitudinalVelocty <= 0.01f & omega == 0)){
-        //     alpha = 0;
-        //     omega += alpha * timeDelta;
-        //     omega = Mathf.Clamp(omega, 0, 1000000);
-        //     // rb.isKinematic = true;        
-            
-        // }        
-        // else if(accel >= 0 ){
-        //     rb.isKinematic = false;
-        //     alpha = (accel * 100) * wheelRadius / 0.5f * wheelMass * Mathf.Pow(wheelRadius, 2);
-        //     omega += alpha * timeDelta;
-        //     omega = Mathf.Clamp(omega, 0, 1000000);
-            
-        //     if( id == 2 | id == 3){
-                
-        //         if(longitudinalVelocty < omega * wheelRadius){
-        //             slipRatio = (longitudinalVelocty - omega * wheelRadius)/Mathf.Abs(omega * wheelRadius);               
+        // // else if(longitudinalVelocty < omega*wheelRadius){
+        // //     slipRatio = (longitudinalVelocty - omega * wheelRadius)/(omega * wheelRadius);
 
-        //         }                
-        //         else if (longitudinalVelocty >= omega * wheelRadius){
-        //             slipRatio = 0;
-        //         }
-
-
-        //         // longitudinalForce =  -tyreEquation(slipRatio, D_long, C_long, B_long, E_long);
-        //         longitudinalForce = -complexTyreEquation(slipRatio, fLongDynamicLimit, C_long, B_long, E_long);
-        //     }
-        //     else{
-        //         omega = longitudinalVelocty/wheelRadius;
-        //     }
-
+        // // }
+        // else{
+        //     slipRatio = 0;
         // }
-
-                  
         
-        if(float.IsNaN(longitudinalForce)){
-            longitudinalForce = 0;
-        }
+
+        
+        // longitudinalForce =  -tyreEquation(slipRatio, D_long, C_long, B_long, E_long);
+        longitudinalForce = -complexTyreEquation(slipRatio, fLongDynamicLimit, C_long, B_long, E_long);         
+        
+
+
+     
+        
+        
 
 
 
@@ -219,10 +208,30 @@ public class Wheel{
         wheelMesh.transform.Rotate(Mathf.Rad2Deg * omega * timeDelta, 0, 0, Space.Self);     
 
         lateralForce = complexTyreEquation(slipAngle, fLatDynamicLimit, C_lat, B_lat, E_lat);
-        forceVector = longitudinalForce * wheelObject.transform.forward + lateralForce * wheelObject.transform.right;
 
-        // Debug.Log($"Wheel ID: {id}, alpha = {alpha}, Vertical Load = {verticalLoad}, F_long = {longitudinalForce}, F_lat = {lateralForce}, omega(deg/s) = {Mathf.Rad2Deg * omega}, RPM = {9.5493f * omega}, Slip Ratio = {slipRatio}, slip angle (deg) = {Mathf.Rad2Deg *slipAngle}  ");
-        Debug.Log($"Wheel id = {id}, Limits = ({fLongLimit},{fLatLimit}), Dynamic Limits = ({fLongDynamicLimit},{fLatDynamicLimit}), Forces = ({longitudinalForce},{lateralForce}), Vertical Load = {verticalLoad}");
+        if(float.IsNaN(longitudinalForce)){
+            longitudinalForce = 0;
+        }
+        if(float.IsNaN(lateralForce)){
+            lateralForce = 0;
+        }
+
+        if(accel >= 0){
+            if(id == 2 | id == 3){
+                forceVector = longitudinalForce * wheelObject.transform.forward + lateralForce * wheelObject.transform.right;
+            }
+            else{
+                forceVector = lateralForce * wheelObject.transform.right;
+            }
+
+        }else{
+            forceVector = longitudinalForce * wheelObject.transform.forward + lateralForce * wheelObject.transform.right;
+        }
+        
+        
+
+        Debug.Log($"Wheel ID: {id}, alpha = {alpha}, Vertical Load = {verticalLoad}, F_long = {longitudinalForce}, F_lat = {lateralForce}, omega(deg/s) = {Mathf.Rad2Deg * omega}, RPM = {9.5493f * omega}, Slip Ratio = {slipRatio}, slip angle (deg) = {Mathf.Rad2Deg *slipAngle}  ");
+        // Debug.Log($"Wheel id = {id}, Limits = ({fLongLimit},{fLatLimit}), Dynamic Limits = ({fLongDynamicLimit},{fLatDynamicLimit}), Forces = ({longitudinalForce},{lateralForce}), Vertical Load = {verticalLoad}");
         
 
         // Writes data to csv file.
@@ -246,7 +255,7 @@ public class Wheel{
                 
         // }
 
-
+        
 
 
 

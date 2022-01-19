@@ -171,7 +171,6 @@ public class RaycastController : MonoBehaviour{
                 Vector3 wheelForceVector = wheels[i].getUpdatedForce(accel, hit, Time.fixedDeltaTime, suspensionForceVector.magnitude);            
                                 
                 rb.AddForceAtPosition(wheelForceVector + suspensionForceVector, hit.point); 
-
             }
             else{
 
@@ -191,7 +190,7 @@ public class RaycastController : MonoBehaviour{
                 timerOn = false;
             }
         }
-        // Debug.Log($"Timer = {theTime}");
+        Debug.Log($"Timer = {theTime}");
 
     }
     
