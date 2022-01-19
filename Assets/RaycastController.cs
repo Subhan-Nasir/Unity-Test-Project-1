@@ -279,6 +279,9 @@ public class RaycastController : MonoBehaviour{
         return wheels;
     }
    
-    
+    public float getSteeringAngleL(){return steerAngleLeft;}
+    public float getSteeringAngleR(){return steerAngleRight;}
+    public float getAccel(){return accel;}
+
 }
 
