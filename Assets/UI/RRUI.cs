@@ -14,12 +14,14 @@ public class RRUI : MonoBehaviour{
     public Text forceLabel;
     public Text slipLabel;
     public Text omegaLabel;
+    public Text VLoadlabel;
     private int i;
     void Update(){
     RaycastController new_car = carObject.GetComponent<RaycastController>();
     
     
-        Wheel[] wheelsList = new_car.getWheels();     
+        Wheel[] wheelsList = new_car.getWheels();
+        Suspension[] suspensionList = new_car.getSuspensions();     
 
         i=3   ;
 
@@ -46,6 +48,9 @@ public class RRUI : MonoBehaviour{
         if (omegaLabel != null){
             omegaLabel.text = Math.Round(Mathf.Rad2Deg*wheelsList[i].omega,2).ToString();
         }          
+        if (VLoadlabel != null){
+            VLoadlabel.text = suspensionList[i].force.magnitude.ToString();
+        }            
      
     }
       
