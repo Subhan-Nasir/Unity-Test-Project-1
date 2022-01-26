@@ -8,6 +8,7 @@ public class RaycastController : MonoBehaviour{
 
     
     public Rigidbody rb;
+    public bool enableTimer;
     public List<GameObject> springs;
     public List<GameObject> wheelObjects;
     public List<GameObject> meshes;
@@ -29,7 +30,7 @@ public class RaycastController : MonoBehaviour{
 
     [Header("Wheel")]
     public float wheelRadius = 0.23f;
-    public float wheelMass = 0.1f;    
+    public float wheelMass = 50000f;    
 
         
     // Order of constants >>> D, C, B, E, c, m
@@ -190,7 +191,11 @@ public class RaycastController : MonoBehaviour{
                 timerOn = false;
             }
         }
-        Debug.Log($"Timer = {theTime}");
+
+        if(enableTimer == true){
+            Debug.Log($"Timer = {theTime}");
+        }
+        
 
     }
     
