@@ -12,7 +12,8 @@ public class Wheel{
     public GameObject wheelMesh;
     public Rigidbody rb;
     public float wheelRadius;
-    public float wheelMass;  
+    public float wheelMass;
+    public float momentOfInertia;  
 
 
     public float slipAngle;
@@ -62,6 +63,7 @@ public class Wheel{
         this.rb = rb;
         this.wheelRadius = wheelRadius;
         this.wheelMass = wheelMass;
+        this.momentOfInertia = 0.5f * wheelMass * Mathf.Pow(wheelRadius, 2);
 
 
         this.B_long = longitudinalConstants["B"];
@@ -139,7 +141,7 @@ public class Wheel{
         fLatDynamicLimit = dynamicPeakLateral(longitudinalForce, fLongLimit, fLatLimit);
 
         if(accel == 0){
-            wheelTorque = -(verticalLoad * omega*wheelRadius * 0.00003f);
+            wheelTorque = -(verticalLoad * omega*wheelRadius * 0.00003f); // rolling resistance
             torque = wheelTorque;
             slipRatio = (longitudinalVelocty - omega * wheelRadius)/Mathf.Abs(omega * wheelRadius);
 
@@ -147,37 +149,42 @@ public class Wheel{
         else if(accel > 0){
 
             if(id == 2 | id == 3){
-                engineTorque = accel * 10;
+                wheelTorque = -(verticalLoad * omega*wheelRadius * 0.00003f);
+                engineTorque = accel * 100;
                 
                 slipRatio = (longitudinalVelocty - omega * wheelRadius)/Mathf.Abs(omega * wheelRadius);
             }
             else{
-                engineTorque = 0;
-                
+                wheelTorque = -(verticalLoad * omega*wheelRadius * 0.00003f);
+                engineTorque = longitudinalForce * wheelRadius;
+                slipRatio = (omega * wheelRadius - longitudinalVelocty)/Mathf.Abs(longitudinalVelocty);
             }
 
-            torque = engineTorque;
+            torque = engineTorque + wheelTorque;
 
         }
         else if(accel < 0 ){
             if(omega > 0){
-                brakingTorque = 20* longitudinalVelocty;
+                wheelTorque = -(verticalLoad * omega*wheelRadius * 0.00003f);
+                brakingTorque = 200* longitudinalVelocty;
             }
             else{
+                wheelTorque = -(verticalLoad * omega*wheelRadius * 0.00003f);
                 brakingTorque = 0;
             }
             if(id == 2 | id == 3){
                 omega = longitudinalVelocty/wheelRadius;
             }
-            torque = -brakingTorque;
+            
+            torque = -brakingTorque + wheelTorque;
             slipRatio = (longitudinalVelocty - omega * wheelRadius)/Mathf.Abs(omega * wheelRadius);
 
         }
 
-        alpha = torque / (0.5f * wheelMass * Mathf.Pow(wheelRadius, 2));
-        if(id == 0 | id == 1){
-            omega = longitudinalVelocty/wheelRadius;
-        }
+        alpha = torque / momentOfInertia;
+        // if(id == 0 | id == 1){
+        //     omega = longitudinalVelocty/wheelRadius;
+        // }
        
         omega += alpha * timeDelta;
         // if(longitudinalVelocty > omega*wheelRadius){
@@ -196,14 +203,6 @@ public class Wheel{
         // longitudinalForce =  -tyreEquation(slipRatio, D_long, C_long, B_long, E_long);
         longitudinalForce = -complexTyreEquation(slipRatio, fLongDynamicLimit, C_long, B_long, E_long);         
         
-
-
-     
-        
-        
-
-
-
         
         wheelMesh.transform.Rotate(Mathf.Rad2Deg * omega * timeDelta, 0, 0, Space.Self);     
 
@@ -230,9 +229,9 @@ public class Wheel{
         
         
 
-        Debug.Log($"Wheel ID: {id}, alpha = {alpha}, Vertical Load = {verticalLoad}, F_long = {longitudinalForce}, F_lat = {lateralForce}, omega(deg/s) = {Mathf.Rad2Deg * omega}, RPM = {9.5493f * omega}, Slip Ratio = {slipRatio}, slip angle (deg) = {Mathf.Rad2Deg *slipAngle}  ");
+        // Debug.Log($"Wheel ID: {id}, I = {momentOfInertia}, alpha = {alpha}, Vertical Load = {verticalLoad}, F_long = {longitudinalForce}, F_lat = {lateralForce}, omega(deg/s) = {Mathf.Rad2Deg * omega}, RPM = {9.5493f * omega}, Slip Ratio = {slipRatio}, slip angle (deg) = {Mathf.Rad2Deg *slipAngle}  ");
         // Debug.Log($"Wheel id = {id}, Limits = ({fLongLimit},{fLatLimit}), Dynamic Limits = ({fLongDynamicLimit},{fLatDynamicLimit}), Forces = ({longitudinalForce},{lateralForce}), Vertical Load = {verticalLoad}");
-        
+        Debug.Log($"ID: {id}, Wheel mass = {wheelMass}, Wheel Radius = {wheelRadius}, Moment of inertia = {momentOfInertia}");
 
         // Writes data to csv file.
         // if(id == 3){
@@ -265,5 +264,4 @@ public class Wheel{
     }
 
 }
-    
-
+   
