@@ -26,26 +26,11 @@ public class RaycastController : MonoBehaviour{
     
     private Suspension[] suspensions = new Suspension[4];
     
-
-
     [Header("Wheel")]
     public float wheelRadius = 0.23f;
-    public float wheelMass = 50000f;    
-
-        
-    // Order of constants >>> D, C, B, E, c, m
-    // New
-    // private float[] longitudinalConstants = new float[]{1502, 0.1879f, 17.74f, 1.137f, 0.01305f, 2.173E-6f};
-    // private float[] lateralConstants = new float[]{1596, 1.5f, 12, 0.4f};
-
-    // Old
-    // private float[] longitudinalConstants = new float[]{1617, 1.3915f, 12.626f, 0.3936f, 0.01305f, 2.173E-6f};
-    // private float[] lateralConstants = new float[]{1617, 1.3915f, 12.626f, 0.3936f};
-
-    // One at a time
-    // private float[] longitudinalConstants = new float[]{1502, 0.1879f, 17.74f, 1f, 0.01305f, 2.173E-6f};
-    // private float[] lateralConstants = new float[]{1617, 1.3915f, 12.626f, 0.3936f};
-
+    public float wheelMass = 5;    
+       
+    
     private Dictionary<string, float> lateralConstants = new Dictionary<string,float>(){
         {"B", 11.45f},
         {"C", 1.551f},
@@ -55,16 +40,23 @@ public class RaycastController : MonoBehaviour{
         {"m", 2.533E-7f}
     };
 
-    private Dictionary<string, float> longitudinalConstants = new Dictionary<string, float>(){
-        {"B", 11.95f},
-        {"C", 1.515f},
-        {"D", 1609},
-        {"E", 0.01497f},
-        {"c", 0.001926f},
-        {"m", 4.03E-7f}     
-    };
+    // private Dictionary<string, float> longitudinalConstants = new Dictionary<string, float>(){
+    //     {"B", 11.95f},
+    //     {"C", 1.515f},
+    //     {"D", 1609},
+    //     {"E", 0.1497f},
+    //     {"c", 0.001926f},
+    //     {"m", 4.03E-7f}     
+    // };
     
-
+    private Dictionary<string, float> longitudinalConstants = new Dictionary<string, float>(){
+        {"B", 11.93f},
+        {"C", 1.716f},
+        {"D", 1711},
+        {"E", 0.3398f},
+        {"c", 0.00179f},
+        {"m", 3.62E-7f}     
+    };
     
     private Wheel[] wheels = new Wheel[4];
 
@@ -93,7 +85,7 @@ public class RaycastController : MonoBehaviour{
     private NewControls keys;
     private float throttle;
     private float brake;
-    private float accel;
+    private float userInput;
 
     private float theTime = 0f;
     private bool timerOn = false;
@@ -147,10 +139,10 @@ public class RaycastController : MonoBehaviour{
       
         
         if(throttle > brake){
-            accel = throttle;
+            userInput = throttle;
         }
         else{
-            accel = -brake;
+            userInput = -brake;
         }
 
         
@@ -169,7 +161,7 @@ public class RaycastController : MonoBehaviour{
                 
                 // Suspension force in the vertical direction.
                 Vector3 suspensionForceVector = suspensions[i].getUpdatedForce(hit, Time.fixedDeltaTime);
-                Vector3 wheelForceVector = wheels[i].getUpdatedForce(accel, hit, Time.fixedDeltaTime, suspensionForceVector.magnitude);            
+                Vector3 wheelForceVector = wheels[i].getUpdatedForce(userInput, hit, Time.fixedDeltaTime, suspensionForceVector.magnitude);            
                                 
                 rb.AddForceAtPosition(wheelForceVector + suspensionForceVector, hit.point); 
             }
@@ -208,20 +200,20 @@ public class RaycastController : MonoBehaviour{
         for(int i = 0; i < springs.Count; i++){
         
                         
-            Gizmos.color = Color.blue;
-            Ray ray = new Ray(springs[i].transform.position, -transform.up);           
-            Gizmos.DrawLine(ray.origin, -suspensions[i].springLength * transform.up + springs[i].transform.position);
+            // Gizmos.color = Color.blue;
+            // Ray ray = new Ray(springs[i].transform.position, -transform.up);           
+            // Gizmos.DrawLine(ray.origin, -suspensions[i].springLength * transform.up + springs[i].transform.position);
 
             
-            Gizmos.color = Color.yellow;
-            Gizmos.DrawLine(-suspensions[i].springLength * transform.up + springs[i].transform.position, -suspensions[i].springLength * transform.up + springs[i].transform.position + transform.up * -wheelRadius);
+            // Gizmos.color = Color.yellow;
+            // Gizmos.DrawLine(-suspensions[i].springLength * transform.up + springs[i].transform.position, -suspensions[i].springLength * transform.up + springs[i].transform.position + transform.up * -wheelRadius);
             
         
             Gizmos.color = Color.white;
-            Gizmos.DrawRay(wheels[i].wheelObject.transform.position, wheels[i].wheelObject.transform.right * (0.5f));
-            Gizmos.DrawRay(wheels[i].wheelObject.transform.position, wheels[i].wheelObject.transform.forward * (0.5f));
+            // Gizmos.DrawRay(wheels[i].wheelObject.transform.position, wheels[i].wheelObject.transform.right * (0.5f));
+            // Gizmos.DrawRay(wheels[i].wheelObject.transform.position, wheels[i].wheelObject.transform.forward * (0.5f));
             
-
+            Gizmos.DrawRay(wheels[i].wheelObject.transform.position, wheels[i].forceVector/1000 );
             
         }
         
@@ -285,7 +277,7 @@ public class RaycastController : MonoBehaviour{
    
     public float getSteeringAngleL(){return steerAngleLeft;}
     public float getSteeringAngleR(){return steerAngleRight;}
-    public float getAccel(){return accel;}
+    public float getAccel(){return userInput;}
 
 }
 

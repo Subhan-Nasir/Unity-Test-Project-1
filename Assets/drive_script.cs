@@ -21,7 +21,7 @@ public class drive_script : MonoBehaviour
     public GameObject[] wheels;
 
     [Header("Drivetrain")]
-    public float max_torque = 200;
+    public float max_torque = 100;
     public bool all_wheel_drive = true;
 
     private float torque;
@@ -54,6 +54,11 @@ public class drive_script : MonoBehaviour
 
     private Rigidbody car;
     private NewControls controls;
+
+    private float theTime = 0f;
+    private bool timerOn = false;
+    private bool speedReached = false;
+    public bool enableTimer;
 
     private void Awake(){
         controls = new NewControls();
@@ -102,6 +107,24 @@ public class drive_script : MonoBehaviour
 
         // Calls the function to drive the car
         drive(accel,steer);
+
+        float carSpeed = car.velocity.z;
+        if(carSpeed > 0 & speedReached == false){
+            timerOn = true;
+        }
+
+        if(timerOn == true){
+            theTime += Time.fixedDeltaTime;
+            
+            if(carSpeed >= 26.8f){
+                speedReached = true;
+                timerOn = false;
+            }
+        }
+
+        if(enableTimer == true){
+            Debug.Log($"Timer = {theTime}");
+        }
 
     }
 
