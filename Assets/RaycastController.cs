@@ -161,7 +161,7 @@ public class RaycastController : MonoBehaviour{
                 
                 // Suspension force in the vertical direction.
                 Vector3 suspensionForceVector = suspensions[i].getUpdatedForce(hit, Time.fixedDeltaTime);
-                Vector3 wheelForceVector = wheels[i].getUpdatedForce(userInput, hit, Time.fixedDeltaTime, suspensionForceVector.magnitude);            
+                Vector3 wheelForceVector = wheels[i].getUpdatedForce(userInput, hit, Time.fixedDeltaTime, suspensions[i].springForce);            
                                 
                 rb.AddForceAtPosition(wheelForceVector + suspensionForceVector, hit.point); 
             }
@@ -201,19 +201,19 @@ public class RaycastController : MonoBehaviour{
         
                         
             // Gizmos.color = Color.blue;
-            // Ray ray = new Ray(springs[i].transform.position, -transform.up);           
-            // Gizmos.DrawLine(ray.origin, -suspensions[i].springLength * transform.up + springs[i].transform.position);
+            Ray ray = new Ray(springs[i].transform.position, -transform.up);           
+            Gizmos.DrawLine(ray.origin, -suspensions[i].springLength * transform.up + springs[i].transform.position);
 
             
-            // Gizmos.color = Color.yellow;
-            // Gizmos.DrawLine(-suspensions[i].springLength * transform.up + springs[i].transform.position, -suspensions[i].springLength * transform.up + springs[i].transform.position + transform.up * -wheelRadius);
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawLine(-suspensions[i].springLength * transform.up + springs[i].transform.position, -suspensions[i].springLength * transform.up + springs[i].transform.position + transform.up * -wheelRadius);
             
         
             Gizmos.color = Color.white;
-            // Gizmos.DrawRay(wheels[i].wheelObject.transform.position, wheels[i].wheelObject.transform.right * (0.5f));
-            // Gizmos.DrawRay(wheels[i].wheelObject.transform.position, wheels[i].wheelObject.transform.forward * (0.5f));
+            Gizmos.DrawRay(wheels[i].wheelObject.transform.position, wheels[i].wheelObject.transform.right * (0.5f));
+            Gizmos.DrawRay(wheels[i].wheelObject.transform.position, wheels[i].wheelObject.transform.forward * (0.5f));
             
-            Gizmos.DrawRay(wheels[i].wheelObject.transform.position, wheels[i].forceVector/1000 );
+            // Gizmos.DrawRay(wheels[i].wheelObject.transform.position, wheels[i].forceVector/1000 );
             
         }
         
