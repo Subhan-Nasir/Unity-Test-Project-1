@@ -20,7 +20,8 @@ public class Suspension{
 
     public float springForce;
     public float damperForce;
-    public Vector3 force = new Vector3();
+    public float force;
+    public Vector3 forceVector; 
 
     public Suspension(float id, float restLength, float springTravel, float springStiffness, float dampingCoefficient, float wheelRadius){
         this.id = id;
@@ -47,12 +48,14 @@ public class Suspension{
         springVelocity = (springLength - previousLength)/timeDelta;
         springForce = springStiffness * (restLength - springLength);
         damperForce = dampingCoefficient * springVelocity;
-        force = (springForce - damperForce) * hit.normal;
+        force = springForce - damperForce;
+        forceVector = (springForce - damperForce) * hit.normal;
+        
 
         // Debug.Log($"Spring id = {id}, Rest Length ={restLength}, current length = {springLength}, suspension force = {springForce - damperForce}");
         
-        
-        return force;
+        Debug.Log($"Suspension {id}: force = {force}, force vector = {forceVector}, spring force = {springForce}, damper force = {damperForce}, length = {springLength}, velocity = {springVelocity}");
+        return forceVector;
 
     }
 

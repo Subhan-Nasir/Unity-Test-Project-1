@@ -315,6 +315,7 @@ public class Wheel{
 
     public float alpha;
     public float omega;
+
     public float verticalLoad;
 
 
@@ -387,7 +388,7 @@ public class Wheel{
             slipRatio = (wR - velocity)/velocity;
         }
 
-        slipRatio = Mathf.Clamp(slipRatio, -1,1);
+        // slipRatio = Mathf.Clamp(slipRatio, -1,1);
          
         return slipRatio;
     }
@@ -410,11 +411,14 @@ public class Wheel{
     
 
     public Vector3 getUpdatedForce(float userInput, RaycastHit hit, float timeDelta, float verticalLoad){
-        this.verticalLoad = verticalLoad;
 
+        
         if(verticalLoad < 0){
             verticalLoad = 0;
         }
+
+        
+        
         
         wheelObject.transform.position = hit.point + hit.normal * wheelRadius;
         wheelVelocityLS = wheelObject.transform.InverseTransformDirection(rb.GetPointVelocity(hit.point));
@@ -422,14 +426,20 @@ public class Wheel{
         lateralVelocity = wheelVelocityLS.x;
         longitudinalVelocity = wheelVelocityLS.z;              
                
-        fLongLimit = tyreCurvePeak(c_long, m_long, D_long, verticalLoad);
-        fLatLimit = tyreCurvePeak(c_lat, m_lat, D_lat, verticalLoad);
+        fLongLimit = 0.8f * tyreCurvePeak(c_long, m_long, D_long, verticalLoad);
+        fLatLimit = 0.8f * tyreCurvePeak(c_lat, m_lat, D_lat, verticalLoad);
         
         fLongDynamicLimit = dynamicPeakLongitudinal(lateralForce, fLongLimit, fLatLimit);
         fLatDynamicLimit = dynamicPeakLateral(longitudinalForce, fLongLimit, fLatLimit);
 
+        if(id == 2 | id == 3){
+            engineTorque = 200 * userInput;
+            
+        }
+        else{
+            engineTorque = 0;
+        }
         
-        engineTorque = 100 * userInput;
         wheelTorque = -getRollingResistance(verticalLoad, omega, wheelRadius, rrCoefficient);
 
         torque = engineTorque + wheelTorque;
@@ -442,10 +452,11 @@ public class Wheel{
 
         
         slipRatio = calculateSlipRatio(longitudinalVelocity, omega, wheelRadius);        
-        longitudinalForce = complexTyreEquation(slipRatio, fLongDynamicLimit, C_long, B_long, E_long);        
+        longitudinalForce =complexTyreEquation(slipRatio, fLongDynamicLimit, C_long, B_long, E_long);        
 
-        slipAngle = calculateSlipAngle(longitudinalVelocity, lateralVelocity, threshold: 0.5f);     
+        slipAngle = calculateSlipAngle(longitudinalVelocity, lateralVelocity, threshold: 3.5f);     
         lateralForce = complexTyreEquation(slipAngle, fLatDynamicLimit, C_lat, B_lat, E_lat);
+        
 
         
 
@@ -459,10 +470,10 @@ public class Wheel{
         forceVector = longitudinalForce * wheelObject.transform.forward + lateralForce * wheelObject.transform.right;
         
        
-        Debug.Log($"Wheel id = {id}, Longitudinal Velocity = {longitudinalVelocity}, RPM = {9.5493f * omega}, wR = {omega*wheelRadius}, slip ratio = {slipRatio}, Forces = ({longitudinalForce},{lateralForce}), Rolling Resistance (Nm) = {wheelTorque} ");
+        // Debug.Log($"Wheel id = {id}, Longitudinal Velocity = {longitudinalVelocity}, RPM = {9.5493f * omega}, wR = {omega*wheelRadius}, slip ratio = {slipRatio}, Force vector = {forceVector}, Rolling Resistance (Nm) = {wheelTorque} ");
         
         // Debug.Log($" Wheel id = {id}, Limits = ({fLongLimit},{fLatLimit}), Dynamic Limits = ({fLongDynamicLimit},{fLatDynamicLimit}), Forces = ({longitudinalForce},{lateralForce}), Load = {verticalLoad}");
-        
+        // Debug.Log($"Wheel id = {id}, Longitudinal Velocity = {longitudinalVelocity}, Lateral Velocity = {lateralVelocity}");
 
 
         return forceVector;

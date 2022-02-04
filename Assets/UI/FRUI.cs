@@ -16,44 +16,48 @@ public class FRUI : MonoBehaviour{
     public Text omegaLabel;
     public Text VLoadlabel;
     private int i;
+
+
+    private float nextUpdate=0.069f;
     void Update(){
-    RaycastController new_car = carObject.GetComponent<RaycastController>();
+        if(Time.time>=nextUpdate){
+            nextUpdate=Time.time+0.069f;
+        
+            RaycastController new_car = carObject.GetComponent<RaycastController>();
     
     
-        Wheel[] wheelsList = new_car.getWheels();
-        Suspension[] suspensionList = new_car.getSuspensions();     
+            Wheel[] wheelsList = new_car.getWheels();
+            Suspension[] suspensionList = new_car.getSuspensions();     
 
-        i=1   ;
+            i=1   ;
 
-        if (RPMLabel != null){
-           RPMLabel.text = Math.Round((9.5453*wheelsList[i].omega),2).ToString();
-        }  
+            if (RPMLabel != null){
+            RPMLabel.text = Math.Round((9.5453*wheelsList[i].omega),0).ToString();
+            }  
 
-        if (steerAngleLabel != null){
-            steerAngleLabel.text = Math.Round(new_car.getSteeringAngleR(),2).ToString() + "º";
-        }  
+            if (steerAngleLabel != null){
+                steerAngleLabel.text = Math.Round(new_car.getSteeringAngleR(),1).ToString() + "º";
+            }  
 
-        if (torqueLabel != null){
-            torqueLabel.text = wheelsList[i].torque.ToString();
-        }  
+            if (torqueLabel != null){
+                torqueLabel.text = Math.Round(wheelsList[i].torque,1).ToString();
+            }  
 
-        if (forceLabel != null){
-            forceLabel.text = "(" + Math.Round(wheelsList[i].lateralForce,2).ToString()+ ","+ Math.Round(wheelsList[i].longitudinalForce,2).ToString()+")";
-        }  
+            if (forceLabel != null){
+                forceLabel.text = "(" + Math.Round(wheelsList[i].lateralForce,1).ToString()+ ","+ Math.Round(wheelsList[i].longitudinalForce,1).ToString()+")";
+            }  
 
-        if (slipLabel != null){
-            slipLabel.text = "(" + Math.Round(Mathf.Rad2Deg*wheelsList[i].slipAngle,2).ToString()+ ","+ Math.Round(wheelsList[i].slipRatio,2).ToString()+")";
-        }     
+            if (slipLabel != null){
+                slipLabel.text = "(" + Math.Round(Mathf.Rad2Deg*wheelsList[i].slipAngle,1).ToString()+ ","+ Math.Round(wheelsList[i].slipRatio,1).ToString()+")";
+            }     
 
-        if (omegaLabel != null){
-            omegaLabel.text = Math.Round(Mathf.Rad2Deg*wheelsList[i].omega,2).ToString();
-        }      
+            if (omegaLabel != null){
+                omegaLabel.text = Math.Round(Mathf.Rad2Deg*wheelsList[i].omega,1).ToString();
+            }      
 
-        if (VLoadlabel != null){
-            VLoadlabel.text = suspensionList[i].force.magnitude.ToString();
-        }                
-     
+            if (VLoadlabel != null){
+                VLoadlabel.text = Math.Round(suspensionList[i].forceVector.magnitude,0).ToString();
+            }                
+        }
     }
-      
-  
 }

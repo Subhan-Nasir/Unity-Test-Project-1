@@ -49,11 +49,11 @@ public class drive_script : MonoBehaviour
 
     private float throttle;    
     private float brake;
-    private float steer;
+    private float steerInput;
     
 
     private Rigidbody car;
-    private NewControls controls;
+    private NewControls keys;
 
     private float theTime = 0f;
     private bool timerOn = false;
@@ -61,16 +61,16 @@ public class drive_script : MonoBehaviour
     public bool enableTimer;
 
     private void Awake(){
-        controls = new NewControls();
+        keys = new NewControls();
 
     }
 
     private void OnEnable(){
-        controls.Enable();
+        keys.Enable();
     }
 
     private void OnDisable(){
-        controls.Disable();
+        keys.Disable();
     }
 
 
@@ -84,19 +84,30 @@ public class drive_script : MonoBehaviour
     // FixedUpdate is called once per frame
     void FixedUpdate(){
         
-        throttle = controls.Track.Throttle.ReadValue<float>();        
-        brake = controls.Track.Brake.ReadValue<float>();
-        steer = controls.Track.Steering.ReadValue<float>();
-
-        throttle = Mathf.Clamp(throttle, 0,1); 
-        brake = Mathf.Clamp(brake, 0,1);
-        steer = Mathf.Clamp(steer, -1,1);
-
-        Debug.Log($"Throttle input = {throttle}, Brake input = {brake}, Steering input: {steer}");
-        
+        throttle = keys.Track.Throttle.ReadValue<float>();
+        brake = keys.Track.Brake.ReadValue<float>();
 
         // 0 means not pressed, 1 means fully pressed
+        throttle = Mathf.Clamp(throttle, -0.4053848f,0.1921842f); 
+        brake = Mathf.Clamp(brake, 0.8276286f,-0.6f);
         
+        throttle = (throttle - -0.336f)/(0.0895f - -0.336f);
+        brake = (brake - 0.8276286f)/(-0.6f - 0.8276286f);
+        brake=0;
+        // steer = Input.GetAxis("Horizontal");
+        // -1 means left and +1 means right. 0 means no steering
+        steerInput = keys.Track.Steering.ReadValue<float>();
+        steerInput = Mathf.Clamp(steerInput, -1,1);     
+
+
+        // steerInput = keys.Track.Steering.ReadValue<float>();
+        // throttle = keys.Track.Throttle.ReadValue<float>();
+        // brake = keys.Track.Brake.ReadValue<float>();
+
+        // steerInput = Mathf.Clamp(steerInput, -1,1);
+        // throttle = Mathf.Clamp(throttle, 0,1);
+        // brake = Mathf.Clamp(brake, 0,1);
+      
 
         if (throttle > brake){
             accel = throttle;
@@ -106,7 +117,7 @@ public class drive_script : MonoBehaviour
         }
 
         // Calls the function to drive the car
-        drive(accel,steer);
+        drive(accel,steerInput);
 
         float carSpeed = car.velocity.z;
         if(carSpeed > 0 & speedReached == false){
