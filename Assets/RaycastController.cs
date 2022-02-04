@@ -68,10 +68,14 @@ public class RaycastController : MonoBehaviour{
     private float wheel_y;
     private float wheel_z;
     
+    
     private float steerInput;
     private float wheelAngleLeft;
     private float wheelAngleRight;
+
+    
     private float steerAngleLeft;
+    
     private float steerAngleRight;
 
     
@@ -91,6 +95,16 @@ public class RaycastController : MonoBehaviour{
     private bool timerOn = false;
     private bool speedReached = false;
 
+   
+    // [UPyPlot.UPyPlotController.UPyProbe]
+    private float FL_vertical_load;
+    // [UPyPlot.UPyPlotController.UPyProbe]
+    private float FR_vertical_load;
+    [UPyPlot.UPyPlotController.UPyProbe]
+    private float RL_vertical_load;
+    // [UPyPlot.UPyPlotController.UPyProbe]
+    private float RR_vertical_load;
+
     void OnValidate(){
         keys = new NewControls();
         rb.centerOfMass = COM_Fidner.transform.localPosition;     
@@ -99,6 +113,7 @@ public class RaycastController : MonoBehaviour{
         for (int i = 0; i < 4; i++){
             suspensions[i] = new Suspension(i, restLength, springTravel, springStiffness, dampingCoefficient, wheelRadius);                     
             wheels[i] = new Wheel(i, wheelObjects[i], meshes[i], rb, wheelRadius, wheelMass, longitudinalConstants, lateralConstants);
+            
             
         }
         
@@ -161,7 +176,11 @@ public class RaycastController : MonoBehaviour{
                 
                 // Suspension force in the vertical direction.
                 Vector3 suspensionForceVector = suspensions[i].getUpdatedForce(hit, Time.fixedDeltaTime);
-                Vector3 wheelForceVector = wheels[i].getUpdatedForce(userInput, hit, Time.fixedDeltaTime, suspensions[i].springForce);            
+                Vector3 wheelForceVector = wheels[i].getUpdatedForce(userInput, hit, Time.fixedDeltaTime, suspensions[i].springForce);
+                FL_vertical_load = wheels[0].verticalLoad;
+                FR_vertical_load = wheels[1].verticalLoad;
+                RL_vertical_load = wheels[2].verticalLoad;
+                RR_vertical_load = wheels[3].verticalLoad;           
                                 
                 rb.AddForceAtPosition(wheelForceVector + suspensionForceVector, hit.point); 
             }

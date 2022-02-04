@@ -2802,6 +2802,75 @@ Transform:
   m_Father: {fileID: 799749282}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &727560720
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 1736945907249484, guid: 44eacb5f811a5b243a9bf963a0151a66, type: 3}
+      propertyPath: m_Name
+      value: UPyPlotController
+      objectReference: {fileID: 0}
+    - target: {fileID: 4847618919011884, guid: 44eacb5f811a5b243a9bf963a0151a66, type: 3}
+      propertyPath: m_RootOrder
+      value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 4847618919011884, guid: 44eacb5f811a5b243a9bf963a0151a66, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4847618919011884, guid: 44eacb5f811a5b243a9bf963a0151a66, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4847618919011884, guid: 44eacb5f811a5b243a9bf963a0151a66, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4847618919011884, guid: 44eacb5f811a5b243a9bf963a0151a66, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4847618919011884, guid: 44eacb5f811a5b243a9bf963a0151a66, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4847618919011884, guid: 44eacb5f811a5b243a9bf963a0151a66, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4847618919011884, guid: 44eacb5f811a5b243a9bf963a0151a66, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4847618919011884, guid: 44eacb5f811a5b243a9bf963a0151a66, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4847618919011884, guid: 44eacb5f811a5b243a9bf963a0151a66, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4847618919011884, guid: 44eacb5f811a5b243a9bf963a0151a66, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114487704176967620, guid: 44eacb5f811a5b243a9bf963a0151a66, type: 3}
+      propertyPath: interval
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 114487704176967620, guid: 44eacb5f811a5b243a9bf963a0151a66, type: 3}
+      propertyPath: precision
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114487704176967620, guid: 44eacb5f811a5b243a9bf963a0151a66, type: 3}
+      propertyPath: maxSamples
+      value: 200
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 44eacb5f811a5b243a9bf963a0151a66, type: 3}
 --- !u!1 &747981674 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 6026452486426936864, guid: a3dc0b97fa55a4943b2e6b5fc23df8dc, type: 3}
@@ -4383,9 +4452,9 @@ MonoBehaviour:
   - {fileID: 1052341347}
   COM_Fidner: {fileID: 490260644}
   restLength: 0.6
-  springTravel: 0.35
-  springStiffness: 20000
-  dampingCoefficient: 1000
+  springTravel: 0.1
+  springStiffness: 40000
+  dampingCoefficient: 10000
   wheelRadius: 0.23
   wheelMass: 5
   steerAngle: 30

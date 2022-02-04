@@ -315,6 +315,7 @@ public class Wheel{
 
     public float alpha;
     public float omega;
+    public float verticalLoad;
 
 
     public Wheel(float id, GameObject wheelObject, GameObject wheelMesh, Rigidbody rb, float wheelRadius, float wheelMass, Dictionary<string, float> longitudinalConstants, Dictionary<string, float> lateralConstants){
@@ -409,6 +410,7 @@ public class Wheel{
     
 
     public Vector3 getUpdatedForce(float userInput, RaycastHit hit, float timeDelta, float verticalLoad){
+        this.verticalLoad = verticalLoad;
 
         if(verticalLoad < 0){
             verticalLoad = 0;
@@ -457,7 +459,7 @@ public class Wheel{
         forceVector = longitudinalForce * wheelObject.transform.forward + lateralForce * wheelObject.transform.right;
         
        
-        Debug.Log($"Wheel id = {id}, Longitudinal Velocity = {longitudinalVelocity}, RPM = {9.5493f * omega}, wR = {omega*wheelRadius}, slip ratio = {slipRatio}, Force vector = {forceVector}, Rolling Resistance (Nm) = {wheelTorque} ");
+        Debug.Log($"Wheel id = {id}, Longitudinal Velocity = {longitudinalVelocity}, RPM = {9.5493f * omega}, wR = {omega*wheelRadius}, slip ratio = {slipRatio}, Forces = ({longitudinalForce},{lateralForce}), Rolling Resistance (Nm) = {wheelTorque} ");
         
         // Debug.Log($" Wheel id = {id}, Limits = ({fLongLimit},{fLatLimit}), Dynamic Limits = ({fLongDynamicLimit},{fLatDynamicLimit}), Forces = ({longitudinalForce},{lateralForce}), Load = {verticalLoad}");
         
