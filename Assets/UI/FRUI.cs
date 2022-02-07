@@ -56,7 +56,7 @@ public class FRUI : MonoBehaviour{
             }      
 
             if (VLoadlabel != null){
-                VLoadlabel.text = Math.Round(suspensionList[i].forceVector.magnitude,0).ToString();
+                VLoadlabel.text = Math.Round(wheelsList[i].verticalLoad,0).ToString();
             }                
         }
     }

@@ -174,7 +174,7 @@ public class RaycastController : MonoBehaviour{
         for(int i = 0; i<springs.Count; i++){    
 
             bool contact = Physics.Raycast(springs[i].transform.position, -transform.up, out RaycastHit hit, restLength + springTravel + wheelRadius);
-
+            Debug.Log($"Wheel {i}: Contact = {contact}");
             if(contact){            
                 
                 // Suspension force in the vertical direction.
