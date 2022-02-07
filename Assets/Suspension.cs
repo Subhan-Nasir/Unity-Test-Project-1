@@ -46,6 +46,7 @@ public class Suspension{
         springLength = hit.distance - wheelRadius;
         springLength = Mathf.Clamp(springLength, minLength, maxLength);
         springVelocity = (springLength - previousLength)/timeDelta;
+        
         springForce = springStiffness * (restLength - springLength);
         damperForce = dampingCoefficient * springVelocity;
         force = springForce - damperForce;
