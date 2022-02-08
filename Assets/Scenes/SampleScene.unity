@@ -800,7 +800,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &228691206
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1488,7 +1488,6 @@ GameObject:
   - component: {fileID: 402749170}
   - component: {fileID: 402749173}
   - component: {fileID: 402749172}
-  - component: {fileID: 402749171}
   m_Layer: 2
   m_Name: FrontRightWheel
   m_TagString: Untagged
@@ -1511,22 +1510,6 @@ Transform:
   m_Father: {fileID: 1652718894}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!54 &402749171
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 402749169}
-  serializedVersion: 2
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_UseGravity: 1
-  m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
 --- !u!23 &402749172
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -2340,7 +2323,6 @@ GameObject:
   - component: {fileID: 623282885}
   - component: {fileID: 623282888}
   - component: {fileID: 623282887}
-  - component: {fileID: 623282886}
   m_Layer: 2
   m_Name: RearRightWheel
   m_TagString: Untagged
@@ -2363,22 +2345,6 @@ Transform:
   m_Father: {fileID: 1652718894}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!54 &623282886
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 623282884}
-  serializedVersion: 2
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_UseGravity: 1
-  m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
 --- !u!23 &623282887
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -4341,7 +4307,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1240391181}
   - component: {fileID: 1240391180}
-  - component: {fileID: 1240391179}
   - component: {fileID: 1240391178}
   m_Layer: 0
   m_Name: Raycast Reworked
@@ -4349,7 +4314,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1240391178
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4389,47 +4354,6 @@ MonoBehaviour:
   steerAngle: 30
   steerSpeed: 10
   enableAckermannSteering: 1
-  wheelBase: 1.5
-  rearTrack: 1.085
-  turnRadius: 3.14
---- !u!114 &1240391179
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1240391177}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3cf099cc280d636479b763d8ba405645, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  rb: {fileID: 1240391180}
-  springs:
-  - {fileID: 705581659}
-  - {fileID: 464635430}
-  - {fileID: 372136448}
-  - {fileID: 1246183322}
-  wheels:
-  - {fileID: 1432604163}
-  - {fileID: 402749169}
-  - {fileID: 2054500866}
-  - {fileID: 623282884}
-  meshes:
-  - {fileID: 118957295}
-  - {fileID: 159997888}
-  - {fileID: 981644402}
-  - {fileID: 1052341347}
-  COM_Fidner: {fileID: 490260644}
-  restLength: 0.6
-  springTravel: 0.35
-  springStiffness: 20000
-  dampingCoefficient: 1000
-  wheelRadius: 0.23
-  wheelMass: 5
-  steerAngle: 30
-  steerSpeed: 10
-  enableAckermannSteering: 0
   wheelBase: 1.5
   rearTrack: 1.085
   turnRadius: 3.14
@@ -5221,7 +5145,6 @@ GameObject:
   - component: {fileID: 1432604164}
   - component: {fileID: 1432604167}
   - component: {fileID: 1432604166}
-  - component: {fileID: 1432604165}
   m_Layer: 2
   m_Name: FrontLeftWheel
   m_TagString: Untagged
@@ -5244,22 +5167,6 @@ Transform:
   m_Father: {fileID: 1652718894}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!54 &1432604165
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1432604163}
-  serializedVersion: 2
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_UseGravity: 1
-  m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
 --- !u!23 &1432604166
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -6268,7 +6175,7 @@ BoxCollider:
   m_GameObject: {fileID: 1779699175}
   m_Material: {fileID: 13400000, guid: 7f5eaa095df816a4fa9191cfc7c933a6, type: 2}
   m_IsTrigger: 0
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 2
   m_Size: {x: 0.8958204, y: 1.1090372, z: 1.4556093}
   m_Center: {x: -0.053112864, y: 0.5882834, z: -1.4150062}
@@ -6837,7 +6744,6 @@ GameObject:
   - component: {fileID: 2054500867}
   - component: {fileID: 2054500870}
   - component: {fileID: 2054500869}
-  - component: {fileID: 2054500868}
   m_Layer: 2
   m_Name: RearLeftWheel
   m_TagString: Untagged
@@ -6860,22 +6766,6 @@ Transform:
   m_Father: {fileID: 1652718894}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!54 &2054500868
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2054500866}
-  serializedVersion: 2
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_UseGravity: 1
-  m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
 --- !u!23 &2054500869
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -7183,7 +7073,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &919132148250269489
 MonoBehaviour:
   m_ObjectHideFlags: 0

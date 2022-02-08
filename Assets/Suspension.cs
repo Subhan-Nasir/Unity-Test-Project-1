@@ -51,6 +51,8 @@ public class Suspension{
         damperForce = dampingCoefficient * springVelocity;
         force = springForce - damperForce;
         forceVector = (springForce - damperForce) * hit.normal;
+
+        
         
 
         // Debug.Log($"Spring id = {id}, Rest Length ={restLength}, current length = {springLength}, suspension force = {springForce - damperForce}");

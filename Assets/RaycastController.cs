@@ -131,29 +131,29 @@ public class RaycastController : MonoBehaviour{
     }
 
     void Update(){
-        throttle = keys.Track.Throttle.ReadValue<float>();
-        brake = keys.Track.Brake.ReadValue<float>();
-
-        // 0 means not pressed, 1 means fully pressed
-        throttle = Mathf.Clamp(throttle, -0.4053848f,0.1921842f); 
-        brake = Mathf.Clamp(brake, 0.8276286f,-0.6f);
-        
-        throttle = (throttle - -0.336f)/(0.0895f - -0.336f);
-        brake = (brake - 0.8276286f)/(-0.6f - 0.8276286f);
-        brake=0;
-        // steer = Input.GetAxis("Horizontal");
-        // -1 means left and +1 means right. 0 means no steering
-        steerInput = keys.Track.Steering.ReadValue<float>();
-        steerInput = Mathf.Clamp(steerInput, -1,1);     
-
-
-        // steerInput = keys.Track.Steering.ReadValue<float>();
         // throttle = keys.Track.Throttle.ReadValue<float>();
         // brake = keys.Track.Brake.ReadValue<float>();
 
-        // steerInput = Mathf.Clamp(steerInput, -1,1);
-        // throttle = Mathf.Clamp(throttle, 0,1);
-        // brake = Mathf.Clamp(brake, 0,1);
+        // // 0 means not pressed, 1 means fully pressed
+        // throttle = Mathf.Clamp(throttle, -0.4053848f,0.1921842f); 
+        // brake = Mathf.Clamp(brake, 0.8276286f,-0.6f);
+        
+        // throttle = (throttle - -0.336f)/(0.0895f - -0.336f);
+        // brake = (brake - 0.8276286f)/(-0.6f - 0.8276286f);
+        // brake=0;
+        // // steer = Input.GetAxis("Horizontal");
+        // // -1 means left and +1 means right. 0 means no steering
+        // steerInput = keys.Track.Steering.ReadValue<float>();
+        // steerInput = Mathf.Clamp(steerInput, -1,1);     
+
+
+        steerInput = keys.Track.Steering.ReadValue<float>();
+        throttle = keys.Track.Throttle.ReadValue<float>();
+        brake = keys.Track.Brake.ReadValue<float>();
+
+        steerInput = Mathf.Clamp(steerInput, -1,1);
+        throttle = Mathf.Clamp(throttle, 0,1);
+        brake = Mathf.Clamp(brake, 0,1);
       
         
         if(throttle > brake){
@@ -174,7 +174,7 @@ public class RaycastController : MonoBehaviour{
         for(int i = 0; i<springs.Count; i++){    
 
             bool contact = Physics.Raycast(springs[i].transform.position, -transform.up, out RaycastHit hit, restLength + springTravel + wheelRadius);
-            Debug.Log($"Wheel {i}: Contact = {contact}");
+            
             if(contact){            
                 
                 // Suspension force in the vertical direction.
@@ -184,6 +184,8 @@ public class RaycastController : MonoBehaviour{
                 if(Time.realtimeSinceStartup >=0){                
                     rb.AddForceAtPosition(wheelForceVector + suspensionForceVector, hit.point + new Vector3 (0,0.1f,0)); 
                 }
+
+                
             }
             else{
 
@@ -273,10 +275,10 @@ public class RaycastController : MonoBehaviour{
 
         }
 
-        wheelAngleLeft = Mathf.Lerp(wheelAngleLeft, steerAngleLeft, steerSpeed * Time.deltaTime);
-        wheelAngleRight = Mathf.Lerp(wheelAngleRight, steerAngleRight, steerSpeed * Time.deltaTime);
-        // wheelAngleLeft=steerAngleLeft;
-        // wheelAngleRight=steerAngleRight;
+        // wheelAngleLeft = Mathf.Lerp(wheelAngleLeft, steerAngleLeft, steerSpeed * Time.deltaTime);
+        // wheelAngleRight = Mathf.Lerp(wheelAngleRight, steerAngleRight, steerSpeed * Time.deltaTime);
+        wheelAngleLeft=steerAngleLeft;
+        wheelAngleRight=steerAngleRight;
 
 
         wheelObjects[0].transform.localRotation = Quaternion.Euler(
