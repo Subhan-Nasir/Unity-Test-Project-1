@@ -60,10 +60,10 @@ public class Wheel{
     public float verticalLoad;
 
 
-    public Wheel(float id, GameObject wheelObject, GameObject wheelMesh, Rigidbody rb, float wheelRadius, float wheelMass, Dictionary<string, float> longitudinalConstants, Dictionary<string, float> lateralConstants){
+    public Wheel(float id, GameObject wheelObject, Rigidbody rb, float wheelRadius, float wheelMass, Dictionary<string, float> longitudinalConstants, Dictionary<string, float> lateralConstants){
         this.id = id;
         this.wheelObject = wheelObject;
-        this.wheelMesh = wheelMesh;
+        // this.wheelMesh = wheelMesh;
         this.rb = rb;
         this.wheelRadius = wheelRadius;
         this.wheelMass = wheelMass;
@@ -189,7 +189,7 @@ public class Wheel{
         alpha = (torque - longitudinalForce*wheelRadius) / momentOfInertia;       
         omega += alpha * timeDelta;       
 
-        wheelMesh.transform.Rotate(Mathf.Rad2Deg * omega * timeDelta, 0, 0, Space.Self); 
+        // wheelMesh.transform.Rotate(Mathf.Rad2Deg * omega * timeDelta, 0, 0, Space.Self); 
 
         
         slipRatio = calculateSlipRatio(longitudinalVelocity, omega, wheelRadius);        

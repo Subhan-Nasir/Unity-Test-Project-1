@@ -101,7 +101,7 @@ public class RaycastController : MonoBehaviour{
         
         for (int i = 0; i < 4; i++){
             suspensions[i] = new Suspension(i, restLength, springTravel, springStiffness, dampingCoefficient, wheelRadius);                     
-            wheels[i] = new Wheel(i, wheelObjects[i], meshes[i], rb, wheelRadius, wheelMass, longitudinalConstants, lateralConstants);
+            wheels[i] = new Wheel(i, wheelObjects[i], rb, wheelRadius, wheelMass, longitudinalConstants, lateralConstants);
             
         }
         
