@@ -8,7 +8,7 @@ public class DummyRaycast : MonoBehaviour{
     public List<GameObject> springs;
     public List<GameObject> wheelObjects;
 
-    public float restLength = 2;
+    public float naturalLength = 2;
     public float springTravel = 1;
     public float stiffness;
     public float damping;
@@ -69,6 +69,12 @@ public class DummyRaycast : MonoBehaviour{
     private float wheelAngleLeft;
     private float wheelAngleRight;
 
+    [UPyPlot.UPyPlotController.UPyProbe]
+    private float FL_RaycastLength;
+
+    private bool contactFL;
+
+
     void OnValidate(){
         keys = new NewControls();
     }
@@ -85,11 +91,11 @@ public class DummyRaycast : MonoBehaviour{
 
     // Start is called before the first frame update
     void Start(){
-        minLength = restLength - springTravel;
-        maxLength = restLength + springTravel;
+        minLength = naturalLength - springTravel;
+        maxLength = naturalLength + springTravel;
         for(int i = 0; i<springs.Count; i++){
-            previousLengths[i] = restLength;
-            springLengths[i] = restLength;
+            previousLengths[i] = naturalLength;
+            springLengths[i] = naturalLength;
             wheels[i] = new Wheel(i, 
                 wheelObjects[i],                
                 rb,
@@ -127,28 +133,44 @@ public class DummyRaycast : MonoBehaviour{
     // Update is called once per frame
     void FixedUpdate(){
         for(int i = 0; i<springs.Count; i++){
-            bool contact = Physics.Raycast(springs[i].transform.position, -transform.up, out RaycastHit hit, restLength + springTravel + wheelRadius);
+            bool contact = Physics.Raycast(springs[i].transform.position, -transform.up, out RaycastHit hit, naturalLength + springTravel + wheelRadius);
+            if(i == 0){
+                contactFL = contact;
+            }
+
             if(contact){
                 
                 previousLengths[i] = springLengths[i];
                 springLengths[i] = hit.distance - wheelRadius;
                 springLengths[i] = Mathf.Clamp(springLengths[i], minLength, maxLength);
                 springVelocity = (springLengths[i] - previousLengths[i])/Time.fixedDeltaTime;
-                float springForce = stiffness * (restLength - springLengths[i]);
+                float springForce = stiffness * (naturalLength - springLengths[i]);
                 float damperForce = damping * springVelocity;
-                float force = springForce - damperForce;
+                float force = springForce - damperForce;              
+                
                 Vector3 suspensionForceVector = (springForce - damperForce) * hit.normal;
+                
+                
 
                 Vector3 wheelForceVector = wheels[i].getUpdatedForce(userInput, hit, Time.fixedDeltaTime, force);
+                wheelForceVector = new Vector3(0,0,0);
+                
+                
 
 
 
                 rb.AddForceAtPosition(suspensionForceVector + wheelForceVector, hit.point);
                 wheelObjects[i].transform.position = hit.point + hit.normal * wheelRadius;
-                
+                if(i == 0){
+                    FL_RaycastLength = hit.distance;
+                }
             }
 
         }
+
+        
+
+        
         
     }
 
@@ -158,6 +180,7 @@ public class DummyRaycast : MonoBehaviour{
             Gizmos.DrawRay(springs[i].transform.position, -springLengths[i]*springs[i].transform.up);
             Gizmos.DrawRay(wheelObjects[i].transform.position, wheelObjects[i].transform.forward);
             Gizmos.DrawRay(wheelObjects[i].transform.position, wheelObjects[i].transform.right);    
+            Gizmos.DrawSphere(wheelObjects[i].transform.position, wheelRadius);
         }
     }
 
