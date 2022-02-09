@@ -131,29 +131,29 @@ public class RaycastController : MonoBehaviour{
     }
 
     void Update(){
-        // throttle = keys.Track.Throttle.ReadValue<float>();
-        // brake = keys.Track.Brake.ReadValue<float>();
-
-        // // 0 means not pressed, 1 means fully pressed
-        // throttle = Mathf.Clamp(throttle, -0.4053848f,0.1921842f); 
-        // brake = Mathf.Clamp(brake, 0.8276286f,-0.6f);
-        
-        // throttle = (throttle - -0.336f)/(0.0895f - -0.336f);
-        // brake = (brake - 0.8276286f)/(-0.6f - 0.8276286f);
-        // brake=0;
-        // // steer = Input.GetAxis("Horizontal");
-        // // -1 means left and +1 means right. 0 means no steering
-        // steerInput = keys.Track.Steering.ReadValue<float>();
-        // steerInput = Mathf.Clamp(steerInput, -1,1);     
-
-
-        steerInput = keys.Track.Steering.ReadValue<float>();
         throttle = keys.Track.Throttle.ReadValue<float>();
         brake = keys.Track.Brake.ReadValue<float>();
 
-        steerInput = Mathf.Clamp(steerInput, -1,1);
-        throttle = Mathf.Clamp(throttle, 0,1);
-        brake = Mathf.Clamp(brake, 0,1);
+        // 0 means not pressed, 1 means fully pressed
+        throttle = Mathf.Clamp(throttle, -0.336f,0.0895f); 
+        brake = Mathf.Clamp(brake, 0.8276286f,-0.6f);
+        
+        throttle = (throttle - -0.336f)/(0.0895f - -0.336f);
+        brake = (brake - 0.8276286f)/(-0.6f - 0.8276286f);
+        
+        // steer = Input.GetAxis("Horizontal");
+        // -1 means left and +1 means right. 0 means no steering
+        steerInput = keys.Track.Steering.ReadValue<float>();
+        steerInput = Mathf.Clamp(steerInput, -1,1);     
+
+
+        // steerInput = keys.Track.Steering.ReadValue<float>();
+        // throttle = keys.Track.Throttle.ReadValue<float>();
+        // brake = keys.Track.Brake.ReadValue<float>();
+
+        // steerInput = Mathf.Clamp(steerInput, -1,1);
+        // throttle = Mathf.Clamp(throttle, 0,1);
+        // brake = Mathf.Clamp(brake, 0,1);
       
         
         if(throttle > brake){
@@ -210,6 +210,11 @@ public class RaycastController : MonoBehaviour{
         if(enableTimer == true){
             Debug.Log($"Timer = {theTime}");
         }
+
+        if(Time.realtimeSinceStartup >= 2){
+            RL_vertical_load = wheels[2].verticalLoad;
+        }
+        
         
 
     }

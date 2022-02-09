@@ -153,7 +153,7 @@ public class Wheel{
 
     public Vector3 getUpdatedForce(float userInput, RaycastHit hit, float timeDelta, float verticalLoad){
         this.verticalLoad = verticalLoad;
-                
+        Debug.Log(userInput);
         if(verticalLoad < 0){
             verticalLoad = 0;
         }
