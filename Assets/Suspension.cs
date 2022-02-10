@@ -6,9 +6,10 @@ using UnityEngine;
 public class Suspension{
 
     public float id;
-    public float restLength;
+    public float naturalLength;
     public float springTravel;
     public float springStiffness;
+    public float bumpStiffness;
     public float dampingCoefficient;
     public float wheelRadius;
         
@@ -23,11 +24,12 @@ public class Suspension{
     public float force;
     public Vector3 forceVector; 
 
-    public Suspension(float id, float restLength, float springTravel, float springStiffness, float dampingCoefficient, float wheelRadius){
+    public Suspension(float id, float restLength, float springTravel, float springStiffness, float bumpStiffness, float dampingCoefficient, float wheelRadius){
         this.id = id;
-        this.restLength = restLength;
+        this.naturalLength = restLength;
         this.springTravel = springTravel;
         this.springStiffness = springStiffness;
+        this.bumpStiffness = bumpStiffness;
         this.dampingCoefficient = dampingCoefficient;
         this.wheelRadius = wheelRadius;
         
@@ -44,10 +46,19 @@ public class Suspension{
     public Vector3 getUpdatedForce(RaycastHit hit, float timeDelta){
         previousLength = springLength;
         springLength = hit.distance - wheelRadius;
-        springLength = Mathf.Clamp(springLength, minLength, maxLength);
+        springLength = Mathf.Clamp(springLength, minLength-0.01f, maxLength);
         springVelocity = (springLength - previousLength)/timeDelta;
+
+        if(springLength < minLength){
+            springForce = springStiffness * (naturalLength - springLength) + bumpStiffness * (minLength - springLength);
+        }
+        else{
+            springForce = springStiffness * (naturalLength - springLength);
+        }
+
+        // springForce = springStiffness * (naturalLength - springLength);  
         
-        springForce = springStiffness * (restLength - springLength);
+        
         damperForce = dampingCoefficient * springVelocity;
         force = springForce - damperForce;
         forceVector = (springForce - damperForce) * hit.normal;

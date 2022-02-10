@@ -18,9 +18,10 @@ public class RaycastController : MonoBehaviour{
     public GameObject COM_Fidner;
 
     [Header("Suspension Settings")]
-    public float restLength;
+    public float naturalLength;
     public float springTravel;
     public float springStiffness;
+    public float bumpStiffness;
     public float dampingCoefficient; 
     
     
@@ -92,7 +93,7 @@ public class RaycastController : MonoBehaviour{
     private bool speedReached = false;
 
     [UPyPlot.UPyPlotController.UPyProbe]
-    private float RL_vertical_load;
+    private float RL_springLength;
 
     void OnValidate(){
         keys = new NewControls();
@@ -100,7 +101,7 @@ public class RaycastController : MonoBehaviour{
                            
         
         for (int i = 0; i < 4; i++){
-            suspensions[i] = new Suspension(i, restLength, springTravel, springStiffness, dampingCoefficient, wheelRadius);                     
+            suspensions[i] = new Suspension(i, naturalLength, springTravel, springStiffness, bumpStiffness, dampingCoefficient, wheelRadius);                     
             wheels[i] = new Wheel(i, wheelObjects[i], rb, wheelRadius, wheelMass, longitudinalConstants, lateralConstants);
             
         }
@@ -131,29 +132,29 @@ public class RaycastController : MonoBehaviour{
     }
 
     void Update(){
-        throttle = keys.Track.Throttle.ReadValue<float>();
-        brake = keys.Track.Brake.ReadValue<float>();
-
-        // 0 means not pressed, 1 means fully pressed
-        throttle = Mathf.Clamp(throttle, -0.336f,0.0895f); 
-        brake = Mathf.Clamp(brake, 0.8276286f,-0.6f);
-        
-        throttle = (throttle - -0.336f)/(0.0895f - -0.336f);
-        brake = (brake - 0.8276286f)/(-0.6f - 0.8276286f);
-        
-        // steer = Input.GetAxis("Horizontal");
-        // -1 means left and +1 means right. 0 means no steering
-        steerInput = keys.Track.Steering.ReadValue<float>();
-        steerInput = Mathf.Clamp(steerInput, -1,1);     
-
-
-        // steerInput = keys.Track.Steering.ReadValue<float>();
         // throttle = keys.Track.Throttle.ReadValue<float>();
         // brake = keys.Track.Brake.ReadValue<float>();
 
-        // steerInput = Mathf.Clamp(steerInput, -1,1);
-        // throttle = Mathf.Clamp(throttle, 0,1);
-        // brake = Mathf.Clamp(brake, 0,1);
+        // // 0 means not pressed, 1 means fully pressed
+        // throttle = Mathf.Clamp(throttle, -0.336f,0.0895f); 
+        // brake = Mathf.Clamp(brake, 0.8276286f,-0.6f);
+        
+        // throttle = (throttle - -0.336f)/(0.0895f - -0.336f);
+        // brake = (brake - 0.8276286f)/(-0.6f - 0.8276286f);
+        
+        // // steer = Input.GetAxis("Horizontal");
+        // // -1 means left and +1 means right. 0 means no steering
+        // steerInput = keys.Track.Steering.ReadValue<float>();
+        // steerInput = Mathf.Clamp(steerInput, -1,1);     
+
+
+        steerInput = keys.Track.Steering.ReadValue<float>();
+        throttle = keys.Track.Throttle.ReadValue<float>();
+        brake = keys.Track.Brake.ReadValue<float>();
+
+        steerInput = Mathf.Clamp(steerInput, -1,1);
+        throttle = Mathf.Clamp(throttle, 0,1);
+        brake = Mathf.Clamp(brake, 0,1);
       
         
         if(throttle > brake){
@@ -173,7 +174,7 @@ public class RaycastController : MonoBehaviour{
  
         for(int i = 0; i<springs.Count; i++){    
 
-            bool contact = Physics.Raycast(springs[i].transform.position, -transform.up, out RaycastHit hit, restLength + springTravel + wheelRadius);
+            bool contact = Physics.Raycast(springs[i].transform.position, -transform.up, out RaycastHit hit, naturalLength + springTravel + wheelRadius);
             
             if(contact){            
                 
@@ -183,6 +184,10 @@ public class RaycastController : MonoBehaviour{
 
                 if(Time.realtimeSinceStartup >=0){                
                     rb.AddForceAtPosition(wheelForceVector + suspensionForceVector, hit.point + new Vector3 (0,0.1f,0)); 
+                }
+
+                if(i == 2){
+                    RL_springLength = suspensions[i].springLength;
                 }
 
                 
@@ -211,9 +216,7 @@ public class RaycastController : MonoBehaviour{
             Debug.Log($"Timer = {theTime}");
         }
 
-        if(Time.realtimeSinceStartup >= 2){
-            RL_vertical_load = wheels[2].verticalLoad;
-        }
+       
         
         
 

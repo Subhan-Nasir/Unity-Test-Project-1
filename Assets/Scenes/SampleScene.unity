@@ -1153,7 +1153,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!54 &252276405
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -2492,7 +2492,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &594861088
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4747,7 +4747,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1240391178
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4778,9 +4778,10 @@ MonoBehaviour:
   - {fileID: 981644402}
   - {fileID: 1052341347}
   COM_Fidner: {fileID: 490260644}
-  restLength: 0.6
+  naturalLength: 0.6
   springTravel: 0.1
-  springStiffness: 20000
+  springStiffness: 40000
+  bumpStiffness: 100000
   dampingCoefficient: 1000
   wheelRadius: 0.23
   wheelMass: 5
@@ -4814,7 +4815,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1240391177}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 3.7012258, y: 5.17, z: 6.65}
+  m_LocalPosition: {x: 3.7012258, y: 5.839, z: 6.65}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 96369073}
@@ -6668,7 +6669,7 @@ BoxCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1779699175}
   m_Material: {fileID: 13400000, guid: 7f5eaa095df816a4fa9191cfc7c933a6, type: 2}
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_Enabled: 0
   serializedVersion: 2
   m_Size: {x: 0.8958204, y: 1.1090372, z: 1.4556093}
