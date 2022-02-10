@@ -8,9 +8,10 @@ public class Suspension{
     public float id;
     public float naturalLength;
     public float springTravel;
-    public float springStiffness;
-    public float bumpStiffness;
+    public float springStiffness;       
     public float dampingCoefficient;
+    public float bumpStiffness; 
+    public float bumpTravel;
     public float wheelRadius;
         
     public float minLength;
@@ -23,14 +24,16 @@ public class Suspension{
     public float damperForce;
     public float force;
     public Vector3 forceVector; 
+    public bool contact;
 
-    public Suspension(float id, float restLength, float springTravel, float springStiffness, float bumpStiffness, float dampingCoefficient, float wheelRadius){
+    public Suspension(float id, float restLength, float springTravel, float springStiffness, float dampingCoefficient, float bumpStiffness, float bumpTravel, float wheelRadius){
         this.id = id;
         this.naturalLength = restLength;
         this.springTravel = springTravel;
-        this.springStiffness = springStiffness;
-        this.bumpStiffness = bumpStiffness;
+        this.springStiffness = springStiffness;        
         this.dampingCoefficient = dampingCoefficient;
+        this.bumpStiffness = bumpStiffness;
+        this.bumpTravel = bumpTravel;
         this.wheelRadius = wheelRadius;
         
         this.minLength = restLength - springTravel;
@@ -43,14 +46,16 @@ public class Suspension{
 
     
 
-    public Vector3 getUpdatedForce(RaycastHit hit, float timeDelta){
+    public Vector3 getUpdatedForce(RaycastHit hit, float timeDelta, bool contact){
+        this.contact = contact;
         previousLength = springLength;
         springLength = hit.distance - wheelRadius;
-        springLength = Mathf.Clamp(springLength, minLength-0.01f, maxLength);
+        springLength = Mathf.Clamp(springLength, minLength - bumpTravel, maxLength);
         springVelocity = (springLength - previousLength)/timeDelta;
 
         if(springLength < minLength){
             springForce = springStiffness * (naturalLength - springLength) + bumpStiffness * (minLength - springLength);
+            Debug.Log($"Bumpstop activated for suspension {id}");            
         }
         else{
             springForce = springStiffness * (naturalLength - springLength);

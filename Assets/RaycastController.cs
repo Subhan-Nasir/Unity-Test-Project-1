@@ -20,9 +20,16 @@ public class RaycastController : MonoBehaviour{
     [Header("Suspension Settings")]
     public float naturalLength;
     public float springTravel;
-    public float springStiffness;
+    public float springStiffness;    
+    public float dampingCoefficient;
+
+    [Header("Bump stops")] 
     public float bumpStiffness;
-    public float dampingCoefficient; 
+    public float bumpTravel;
+
+    [Header("Anti Roll bars")]
+    public float antiRollStiffness;
+    private float[] antiRollForces = new float[] {0,0};
     
     
     private Suspension[] suspensions = new Suspension[4];
@@ -101,7 +108,7 @@ public class RaycastController : MonoBehaviour{
                            
         
         for (int i = 0; i < 4; i++){
-            suspensions[i] = new Suspension(i, naturalLength, springTravel, springStiffness, bumpStiffness, dampingCoefficient, wheelRadius);                     
+            suspensions[i] = new Suspension(i, naturalLength, springTravel, springStiffness, dampingCoefficient, bumpStiffness, bumpTravel, wheelRadius);                     
             wheels[i] = new Wheel(i, wheelObjects[i], rb, wheelRadius, wheelMass, longitudinalConstants, lateralConstants);
             
         }
@@ -172,19 +179,31 @@ public class RaycastController : MonoBehaviour{
     void FixedUpdate(){
         
  
-        for(int i = 0; i<springs.Count; i++){    
+        for(int i = 0; i<springs.Count; i++){   
 
             bool contact = Physics.Raycast(springs[i].transform.position, -transform.up, out RaycastHit hit, naturalLength + springTravel + wheelRadius);
-            
+          
             if(contact){            
                 
                 // Suspension force in the vertical direction.
-                Vector3 suspensionForceVector = suspensions[i].getUpdatedForce(hit, Time.fixedDeltaTime);
+                Vector3 suspensionForceVector = suspensions[i].getUpdatedForce(hit, Time.fixedDeltaTime, contact);
                 Vector3 wheelForceVector = wheels[i].getUpdatedForce(userInput, hit, Time.fixedDeltaTime, suspensions[i].forceVector.magnitude);            
 
-                if(Time.realtimeSinceStartup >=0){                
-                    rb.AddForceAtPosition(wheelForceVector + suspensionForceVector, hit.point + new Vector3 (0,0.1f,0)); 
+                                
+                rb.AddForceAtPosition(wheelForceVector + suspensionForceVector, hit.point + new Vector3 (0,0.1f,0)); 
+                
+                if(i == 2 | i == 3){
+                    antiRollForces = getAntiRollForces(suspensions[2], suspensions[3], antiRollStiffness);
                 }
+
+                if(i == 2){
+                    rb.AddForceAtPosition(antiRollForces[0] * hit.normal, hit.point);
+                }
+                else if(i == 3){
+                    rb.AddForceAtPosition(antiRollForces[1] * hit.normal, hit.point);
+                }
+                Debug.Log($"Anti roll bar forces = {antiRollForces[0]} and {antiRollForces[1]}");
+
 
                 if(i == 2){
                     RL_springLength = suspensions[i].springLength;
@@ -193,9 +212,14 @@ public class RaycastController : MonoBehaviour{
                 
             }
             else{
+                suspensions[i].contact = false;
 
             }
         }
+
+
+
+
 
         
         float carSpeed = rb.velocity.z;
@@ -246,6 +270,11 @@ public class RaycastController : MonoBehaviour{
             Gizmos.DrawRay(wheels[i].wheelObject.transform.position, wheels[i].wheelObject.transform.forward * (wheels[i].longitudinalForce/1000));
             Gizmos.DrawRay(wheels[i].wheelObject.transform.position, wheels[i].wheelObject.transform.up * wheels[i].verticalLoad/1000);
             
+            Gizmos.color = Color.yellow;
+            if(i == 2 | i == 3){
+                Gizmos.DrawRay(wheels[i].wheelObject.transform.position, wheels[i].wheelObject.transform.up * antiRollForces[i-2]/1000);
+            }
+
             // Gizmos.DrawRay(wheels[i].wheelObject.transform.position, wheels[i].forceVector/1000 );
             
         }
@@ -314,6 +343,31 @@ public class RaycastController : MonoBehaviour{
     public float getSteeringAngleL(){return steerAngleLeft;}
     public float getSteeringAngleR(){return steerAngleRight;}
     public float getAccel(){return userInput;}
+
+
+    public float[] getAntiRollForces(Suspension leftSuspension, Suspension rightSuspension, float antiRollStiffness){
+
+        float travelLeft = 0;
+        float travelRight = 0;
+
+        if(leftSuspension.contact){
+            travelLeft = (leftSuspension.springLength - leftSuspension.naturalLength)/leftSuspension.maxLength;
+        }
+
+        if(rightSuspension.contact){
+            travelRight = (rightSuspension.springLength - rightSuspension.naturalLength)/rightSuspension.maxLength;
+        }        
+        
+
+        float forceLeft = (travelLeft - travelRight) * antiRollStiffness;
+        float forceRight = -forceLeft;
+
+        float[] forceArray = new float[] {forceLeft, forceRight};
+
+        return forceArray;
+        
+
+    }
 
 }
 
