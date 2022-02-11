@@ -202,7 +202,7 @@ public class RaycastController : MonoBehaviour{
                 else if(i == 3){
                     rb.AddForceAtPosition(antiRollForces[1] * hit.normal, hit.point);
                 }
-                Debug.Log($"Anti roll bar forces = {antiRollForces[0]} and {antiRollForces[1]}");
+                // Debug.Log($"Anti roll bar forces = {antiRollForces[0]} and {antiRollForces[1]}");
 
 
                 if(i == 2){
@@ -351,11 +351,11 @@ public class RaycastController : MonoBehaviour{
         float travelRight = 0;
 
         if(leftSuspension.contact){
-            travelLeft = (leftSuspension.springLength - leftSuspension.naturalLength)/leftSuspension.maxLength;
+            travelLeft = (leftSuspension.springLength)/leftSuspension.maxLength;
         }
 
         if(rightSuspension.contact){
-            travelRight = (rightSuspension.springLength - rightSuspension.naturalLength)/rightSuspension.maxLength;
+            travelRight = (rightSuspension.springLength)/rightSuspension.maxLength;
         }        
         
 

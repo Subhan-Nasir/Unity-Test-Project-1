@@ -4784,7 +4784,7 @@ MonoBehaviour:
   dampingCoefficient: 1000
   bumpStiffness: 100000
   bumpTravel: 0.05
-  antiRollStiffness: 5000
+  antiRollStiffness: 0
   wheelRadius: 0.23
   wheelMass: 5
   steerAngle: 30
@@ -6672,7 +6672,7 @@ BoxCollider:
   m_GameObject: {fileID: 1779699175}
   m_Material: {fileID: 13400000, guid: 7f5eaa095df816a4fa9191cfc7c933a6, type: 2}
   m_IsTrigger: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Size: {x: 0.8958204, y: 0.76919293, z: 1.4556093}
   m_Center: {x: -0.053112864, y: 0.75820553, z: -1.4150062}

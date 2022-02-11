@@ -58,6 +58,7 @@ public class Wheel{
     public float omega;
 
     public float verticalLoad;
+    
 
 
     public Wheel(float id, GameObject wheelObject, Rigidbody rb, float wheelRadius, float wheelMass, Dictionary<string, float> longitudinalConstants, Dictionary<string, float> lateralConstants){
@@ -151,6 +152,7 @@ public class Wheel{
     
 
     public Vector3 getUpdatedForce(float userInput, RaycastHit hit, float timeDelta, float verticalLoad){
+        
         this.verticalLoad = verticalLoad;
         // Debug.Log(userInput);
         if(verticalLoad < 0){
@@ -170,21 +172,49 @@ public class Wheel{
         fLongDynamicLimit = dynamicPeakLongitudinal(lateralForce, fLongLimit, fLatLimit);
         fLatDynamicLimit = dynamicPeakLateral(longitudinalForce, fLongLimit, fLatLimit);
 
-        if(id == 2 | id == 3){
+        if(id == 2 | id == 3 ){
             engineTorque = 200 * userInput;
             
         }
         else{
             engineTorque = 0;
         }
-        
+
+
+        if(userInput <0){
+            if(longitudinalVelocity > 1){
+                brakingTorque = 400* userInput;
+            }
+            else if (longitudinalVelocity <= 1){
+                brakingTorque = 400 * userInput * longitudinalVelocity;
+            }
+            
+            
+        }
+        else{
+            brakingTorque = 0;
+        }
+     
         wheelTorque = -getRollingResistance(verticalLoad, omega, wheelRadius, rrCoefficient);
 
-        torque = engineTorque + wheelTorque;
+        torque = engineTorque + wheelTorque + brakingTorque;
+        Debug.Log($"Wheel {id}: Engine torque = {engineTorque}, Wheel torque = {wheelTorque}, Braking Torque = {brakingTorque} ");
         
             
         alpha = (torque - longitudinalForce*wheelRadius) / momentOfInertia;       
-        omega += alpha * timeDelta;       
+        omega += alpha * timeDelta;
+
+        if(userInput < 0){
+            
+            if(longitudinalVelocity > 0){
+                omega = Mathf.Clamp(omega, 0, 10000000);
+            }
+            else if (longitudinalVelocity < 0){
+                omega = Mathf.Clamp(omega, -10000000, 0);
+            }          
+            
+
+        }      
 
         // wheelMesh.transform.Rotate(Mathf.Rad2Deg * omega * timeDelta, 0, 0, Space.Self); 
 
