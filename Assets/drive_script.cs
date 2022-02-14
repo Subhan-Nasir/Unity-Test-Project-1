@@ -19,6 +19,8 @@ public class drive_script : MonoBehaviour
 
     public WheelCollider[] wheel_colliders;
     public GameObject[] wheels;
+    public AnimationCurve engineCurve;
+    
 
     [Header("Drivetrain")]
     public float max_torque = 100;
@@ -60,6 +62,8 @@ public class drive_script : MonoBehaviour
     private bool speedReached = false;
     public bool enableTimer;
 
+
+
     private void Awake(){
         keys = new NewControls();
 
@@ -67,6 +71,33 @@ public class drive_script : MonoBehaviour
 
     private void OnEnable(){
         keys.Enable();
+        engineCurve.keys = new Keyframe[1];
+        engineCurve.AddKey(3000,38.216f);
+        engineCurve.AddKey(3500,39.063f);
+        engineCurve.AddKey(4000,35.961f);
+        engineCurve.AddKey(4500,38.928f);
+        engineCurve.AddKey(5000,40.732f);
+        engineCurve.AddKey(5500,41.690f);
+        engineCurve.AddKey(6000,41.301f);
+        engineCurve.AddKey(6500,37.138f);
+        engineCurve.AddKey(7000,39.776f);
+        engineCurve.AddKey(7500,38.928f);
+        engineCurve.AddKey(8000,44.328f);
+        engineCurve.AddKey(8500,48.926f);
+        engineCurve.AddKey(9000,47.236f);
+        engineCurve.AddKey(9500,45.724f);
+        engineCurve.AddKey(10000,47.711f);
+        engineCurve.AddKey(10500,48.212f);
+        engineCurve.AddKey(11000,48.099f);
+        engineCurve.AddKey(11500,45.760f);
+        engineCurve.AddKey(12000,44.328f);
+        engineCurve.AddKey(12500,42.954f);
+        engineCurve.AddKey(13000,40.536f);
+        engineCurve.AddKey(13500,38.243f);
+        engineCurve.AddKey(14000,35.198f);
+        Debug.Log("engine curve updated");
+        
+
     }
 
     private void OnDisable(){
@@ -76,7 +107,10 @@ public class drive_script : MonoBehaviour
 
     // Start is called before the first frame update
     void Start(){
-        car = GetComponent<Rigidbody> ();      
+
+                
+        car = GetComponent<Rigidbody> ();   
+        
         
     }
 

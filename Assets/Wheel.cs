@@ -173,7 +173,7 @@ public class Wheel{
         fLatDynamicLimit = dynamicPeakLateral(longitudinalForce, fLongLimit, fLatLimit);
 
         if(id == 2 | id == 3 ){
-            engineTorque = 200 * userInput;
+            engineTorque = 400 * userInput;
             
         }
         else{
@@ -183,10 +183,10 @@ public class Wheel{
 
         if(userInput <0){
             if(longitudinalVelocity > 1){
-                brakingTorque = 400* userInput;
+                brakingTorque = 800* userInput;
             }
             else if (longitudinalVelocity <= 1){
-                brakingTorque = 400 * userInput * longitudinalVelocity;
+                brakingTorque = 800 * userInput * longitudinalVelocity;
             }
             
             
