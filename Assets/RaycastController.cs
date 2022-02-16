@@ -24,7 +24,7 @@ public class RaycastController : MonoBehaviour{
     public float totalDrivetrainInertia = 1.5f;
 
 
-    private int currentGear;
+    private int currentGear = 1;
     private float engineRPM;
     private float shiftUp;
     private float shiftDown;
@@ -116,6 +116,8 @@ public class RaycastController : MonoBehaviour{
     [UPyPlot.UPyPlotController.UPyProbe]
     private float RL_springLength;
 
+    private float gearTimer;
+
     void OnValidate(){
         keys = new NewControls();
         rb.centerOfMass = COM_Fidner.transform.localPosition;     
@@ -179,29 +181,29 @@ public class RaycastController : MonoBehaviour{
     }
 
     void Update(){
-        // throttle = keys.Track.Throttle.ReadValue<float>();
-        // brake = keys.Track.Brake.ReadValue<float>();
-
-        // // 0 means not pressed, 1 means fully pressed
-        // throttle = Mathf.Clamp(throttle, -0.336f,0.0895f); 
-        // brake = Mathf.Clamp(brake, 0.8276286f,-0.6f);
-        
-        // throttle = (throttle - -0.336f)/(0.0895f - -0.336f);
-        // brake = (brake - 0.8276286f)/(-0.6f - 0.8276286f);
-        
-        // // steer = Input.GetAxis("Horizontal");
-        // // -1 means left and +1 means right. 0 means no steering
-        // steerInput = keys.Track.Steering.ReadValue<float>();
-        // steerInput = Mathf.Clamp(steerInput, -1,1);     
-
-
-        steerInput = keys.Track.Steering.ReadValue<float>();
         throttle = keys.Track.Throttle.ReadValue<float>();
         brake = keys.Track.Brake.ReadValue<float>();
 
-        steerInput = Mathf.Clamp(steerInput, -1,1);
-        throttle = Mathf.Clamp(throttle, 0,1);
-        brake = Mathf.Clamp(brake, 0,1);
+        // 0 means not pressed, 1 means fully pressed
+        throttle = Mathf.Clamp(throttle, -0.336f,0.0895f); 
+        brake = Mathf.Clamp(brake, -0.4513f,-0.0761f);
+        
+        throttle = (throttle - -0.336f)/(0.0895f - -0.336f);
+        brake = (brake- - 0.4513f)/(-0.4513f - -0.0761f);
+        
+        // steer = Input.GetAxis("Horizontal");
+        // -1 means left and +1 means right. 0 means no steering
+        steerInput = keys.Track.Steering.ReadValue<float>();
+        steerInput = Mathf.Clamp(steerInput, -1,1);     
+
+
+        // steerInput = keys.Track.Steering.ReadValue<float>();
+        // throttle = keys.Track.Throttle.ReadValue<float>();
+        // brake = keys.Track.Brake.ReadValue<float>();
+
+        // steerInput = Mathf.Clamp(steerInput, -1,1);
+        // throttle = Mathf.Clamp(throttle, 0,1);
+        // brake = Mathf.Clamp(brake, 0,1);
       
         shiftUp = keys.Track.ShiftUp.ReadValue<float>();
         shiftDown = keys.Track.ShiftDown.ReadValue<float>();
@@ -213,22 +215,28 @@ public class RaycastController : MonoBehaviour{
             userInput = -brake;
         }
 
-        if(shiftUp == 1){
+
+        if(shiftUp == 1 & gearTimer > 0.2f){
             currentGear += 1;
+            gearTimer = 0;
                      
         }
-        else if(shiftDown == 1){
+        else if(shiftDown == 1 & gearTimer > 0.2f){
             currentGear -= 1;
+            gearTimer = 0;
                        
         }
         else{
             currentGear += 0;
         }
 
-        currentGear = Mathf.Clamp(currentGear, 0,1);
+        gearTimer += Time.deltaTime;
 
 
-        // engineRPM = Mathf.Clamp(engineRPM, idleRPM, 14000);
+        currentGear = Mathf.Clamp(currentGear, 1,5);
+
+
+        engineRPM = Mathf.Clamp(engineRPM, idleRPM, 14000);
         engineTorque = (1-auxillaryLoss) * (engineCurve.Evaluate(engineRPM) * userInput);
         engineBraking = maxEngineBrakingTorque * (1 - userInput);
         
@@ -285,7 +293,7 @@ public class RaycastController : MonoBehaviour{
                 if(currentGear != 0){
                     engineRPM = averageRearRPM * (gearRatios[currentGear + 1] * primaryGearRatio * finalDriveRatio);
                 }
-                Debug.Log($"Engine RPM = {engineRPM}, Engine Torque = {engineTorque}, Current Gear = {currentGear}");
+                Debug.Log($"Engine RPM = {engineRPM}, Engine Torque = {engineTorque}, Current Gear = {currentGear}, User Input = {userInput}");
                 
                 
                 

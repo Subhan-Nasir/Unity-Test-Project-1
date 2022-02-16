@@ -233,23 +233,33 @@ public class Wheel{
 
         omega += alpha * timeDelta;
 
-        if(userInput < 0){
+        // if(userInput < 0){
             
-            if(longitudinalVelocity > 0){
+        //     if(longitudinalVelocity > 0){
                 
-                omega = Mathf.Clamp(omega, 0, (1/9.5493f) * 14000/(currentGearRatio * finalDriveRatio * primaryGearRatio));
+        //         omega = Mathf.Clamp(omega, (1/9.5493f) * 1650/(currentGearRatio * finalDriveRatio * primaryGearRatio), (1/9.5493f) * 14000/(currentGearRatio * finalDriveRatio * primaryGearRatio));
+                
+                
+        //     }
+        //     else if (longitudinalVelocity < 0){
+        //         omega = Mathf.Clamp(omega, -10000000, 0);
+        //     }          
+            
+
+        // }
+        // else{
+        //     omega = Mathf.Clamp(omega, 0, (1/9.5493f) * 14000/(currentGearRatio * finalDriveRatio * primaryGearRatio));
+        // }   
+
+        if(longitudinalVelocity >= 0){
+                
+                omega = Mathf.Clamp(omega, (1/9.5493f) * 1650/(currentGearRatio * finalDriveRatio * primaryGearRatio), (1/9.5493f) * 14000/(currentGearRatio * finalDriveRatio * primaryGearRatio));
                 
                 
             }
             else if (longitudinalVelocity < 0){
                 omega = Mathf.Clamp(omega, -10000000, 0);
-            }          
-            
-
-        }
-        else{
-            omega = Mathf.Clamp(omega, 0, (1/9.5493f) * 14000/(currentGearRatio * finalDriveRatio * primaryGearRatio));
-        }      
+            }     
 
         // wheelMesh.transform.Rotate(Mathf.Rad2Deg * omega * timeDelta, 0, 0, Space.Self); 
 

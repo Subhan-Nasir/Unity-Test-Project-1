@@ -44,17 +44,17 @@ public class @NewControls : IInputActionCollection, IDisposable
                 },
                 {
                     ""name"": ""ShiftUp"",
-                    ""type"": ""Value"",
+                    ""type"": ""Button"",
                     ""id"": ""7ff62607-9fb2-4fe1-b382-5e956c560bec"",
-                    ""expectedControlType"": ""Digital"",
+                    ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": ""Press(behavior=1)""
                 },
                 {
                     ""name"": ""ShiftDown"",
-                    ""type"": ""Value"",
+                    ""type"": ""Button"",
                     ""id"": ""32635704-3996-4c71-af47-f9cb0909fcc0"",
-                    ""expectedControlType"": ""Digital"",
+                    ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": ""Press(behavior=1)""
                 }
@@ -96,7 +96,7 @@ public class @NewControls : IInputActionCollection, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""9c267555-4d0c-434c-8a77-04f2500bf05c"",
-                    ""path"": ""<HID::obp̌pedals̞obp ped obp pedals⟥⟩⟱Ϧ>/ry"",
+                    ""path"": ""<HID::obp̌pedals̞obp ped obp pedals⟥⟩⟱Ϧ>/rz"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
@@ -194,8 +194,30 @@ public class @NewControls : IInputActionCollection, IDisposable
                 },
                 {
                     ""name"": """",
+                    ""id"": ""2e2ac1f7-374c-498b-ae2f-ddc801536711"",
+                    ""path"": ""<HID::Precision Sim Engineering SWD>/button13"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ShiftUp"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
                     ""id"": ""d51d0cb9-9cd0-411b-ae48-dadd0e981f68"",
                     ""path"": ""<Keyboard>/q"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ShiftDown"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""932ca621-9c67-4313-9731-550295869f5a"",
+                    ""path"": ""<HID::Precision Sim Engineering SWD>/button14"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",

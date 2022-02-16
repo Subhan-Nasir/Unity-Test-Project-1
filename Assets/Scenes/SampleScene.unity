@@ -4492,12 +4492,12 @@ MonoBehaviour:
   wheelRadius: 0.23
   wheelMass: 5
   brakeBias: 0.5
-  steerAngle: 30
+  steerAngle: 13
   steerSpeed: 10
   enableAckermannSteering: 1
   wheelBase: 1.5
   rearTrack: 1.085
-  turnRadius: 3.14
+  turnRadius: 7.04
 --- !u!54 &1240391180
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -4522,7 +4522,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1240391177}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 3.7012258, y: 5.839, z: 6.65}
+  m_LocalPosition: {x: 3.7012258, y: 5.162, z: 6.65}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 96369073}
