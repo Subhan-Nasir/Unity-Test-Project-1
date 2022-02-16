@@ -36,7 +36,8 @@ public class RaycastController : MonoBehaviour{
     
     [Header("Wheel")]
     public float wheelRadius = 0.23f;
-    public float wheelMass = 5;    
+    public float wheelMass = 5;
+    public float brakeBias = 0.5f;    
        
     
     private Dictionary<string, float> lateralConstants = new Dictionary<string,float>(){
@@ -109,7 +110,7 @@ public class RaycastController : MonoBehaviour{
         
         for (int i = 0; i < 4; i++){
             suspensions[i] = new Suspension(i, naturalLength, springTravel, springStiffness, dampingCoefficient, bumpStiffness, bumpTravel, wheelRadius);                     
-            wheels[i] = new Wheel(i, wheelObjects[i], rb, wheelRadius, wheelMass, longitudinalConstants, lateralConstants);
+            wheels[i] = new Wheel(i, wheelObjects[i], rb, wheelRadius, wheelMass, brakeBias, longitudinalConstants, lateralConstants);
             
         }
         

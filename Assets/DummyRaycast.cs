@@ -101,6 +101,7 @@ public class DummyRaycast : MonoBehaviour{
                 rb,
                 wheelRadius, 
                 wheelMass,
+                0.5f,
                 longitudinalConstants,
                 lateralConstants);
         }

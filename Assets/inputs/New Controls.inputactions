@@ -28,6 +28,22 @@
                     "expectedControlType": "Axis",
                     "processors": "",
                     "interactions": "Press(pressPoint=1E-10,behavior=2)"
+                },
+                {
+                    "name": "ShiftUp",
+                    "type": "Button",
+                    "id": "7ff62607-9fb2-4fe1-b382-5e956c560bec",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "Press(pressPoint=1E-10)"
+                },
+                {
+                    "name": "ShiftDown",
+                    "type": "Button",
+                    "id": "32635704-3996-4c71-af47-f9cb0909fcc0",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "Press(pressPoint=1E-10)"
                 }
             ],
             "bindings": [
@@ -149,6 +165,28 @@
                     "processors": "",
                     "groups": "",
                     "action": "Steering",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "8217758f-5a1c-442c-84ea-37a2c210bcfe",
+                    "path": "<Keyboard>/e",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ShiftUp",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "d51d0cb9-9cd0-411b-ae48-dadd0e981f68",
+                    "path": "<Keyboard>/q",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ShiftDown",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

@@ -29,6 +29,7 @@ public class Wheel{
     public float engineTorque;
     public float brakingTorque;
     public float torque;
+    public float brakeBias;
 
     public float lateralForce; //Sideways direction    
     public float longitudinalForce; // Forwards direction
@@ -61,7 +62,7 @@ public class Wheel{
     
 
 
-    public Wheel(float id, GameObject wheelObject, Rigidbody rb, float wheelRadius, float wheelMass, Dictionary<string, float> longitudinalConstants, Dictionary<string, float> lateralConstants){
+    public Wheel(float id, GameObject wheelObject, Rigidbody rb, float wheelRadius, float wheelMass, float brakeBias, Dictionary<string, float> longitudinalConstants, Dictionary<string, float> lateralConstants){
         this.id = id;
         this.wheelObject = wheelObject;
         // this.wheelMesh = wheelMesh;
@@ -69,6 +70,7 @@ public class Wheel{
         this.wheelRadius = wheelRadius;
         this.wheelMass = wheelMass;
         this.momentOfInertia = 0.5f * wheelMass * Mathf.Pow(wheelRadius, 2);
+        this.brakeBias = brakeBias;
 
 
         this.B_long = longitudinalConstants["B"];
@@ -172,8 +174,8 @@ public class Wheel{
         fLongDynamicLimit = dynamicPeakLongitudinal(lateralForce, fLongLimit, fLatLimit);
         fLatDynamicLimit = dynamicPeakLateral(longitudinalForce, fLongLimit, fLatLimit);
 
-        if(id == 2 | id == 3 ){
-            engineTorque = 400 * userInput;
+        if((id == 2 | id == 3) & userInput >=0){
+            engineTorque = 100 * userInput;
             
         }
         else{
@@ -183,10 +185,24 @@ public class Wheel{
 
         if(userInput <0){
             if(longitudinalVelocity > 1){
-                brakingTorque = 800* userInput;
+                if(id == 0 | id == 1){
+                    brakingTorque = 400* userInput * (1 - brakeBias);
+                }
+                else{
+                    brakingTorque = 400 * userInput * brakeBias;
+                }
+
+                
             }
             else if (longitudinalVelocity <= 1){
-                brakingTorque = 800 * userInput * longitudinalVelocity;
+                brakingTorque = 400 * userInput ;
+
+                if(id == 0 | id == 1){
+                    brakingTorque = 400* userInput * longitudinalVelocity * (1 - brakeBias);
+                }
+                else{
+                    brakingTorque = 400 * userInput * longitudinalVelocity * brakeBias;
+                }
             }
             
             
@@ -222,7 +238,7 @@ public class Wheel{
         slipRatio = calculateSlipRatio(longitudinalVelocity, omega, wheelRadius);        
         longitudinalForce =complexTyreEquation(slipRatio, fLongDynamicLimit, C_long, B_long, E_long);        
 
-        slipAngle = calculateSlipAngle(longitudinalVelocity, lateralVelocity, threshold: 3.5f);     
+        slipAngle = calculateSlipAngle(longitudinalVelocity, lateralVelocity, threshold: 0.1f);     
         lateralForce = complexTyreEquation(slipAngle, fLatDynamicLimit, C_lat, B_lat, E_lat);
         
 

@@ -3904,6 +3904,11 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  gearRatios: []
+  primaryGearRatio: 0
+  finalDriveRatio: 0
+  idleRPM: 1500
+  auxillaryTorque: 0
   max_torque: 200
   all_wheel_drive: 0
   max_steer_angle: 30
@@ -4793,6 +4798,7 @@ MonoBehaviour:
   antiRollStiffness: 0
   wheelRadius: 0.23
   wheelMass: 5
+  brakeBias: 0.5
   steerAngle: 30
   steerSpeed: 10
   enableAckermannSteering: 1
@@ -7507,7 +7513,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 919132148250269488}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -7.283629, y: 5.26, z: 11.27}
+  m_LocalPosition: {x: -7.283629, y: 5.54, z: 11.27}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4167280742487547995}
@@ -7635,6 +7641,18 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  gearRatios:
+  - -1
+  - 0
+  - 2.75
+  - 2
+  - 1.67
+  - 1.44
+  - 1.33
+  primaryGearRatio: 1.822
+  finalDriveRatio: 4.67
+  idleRPM: 1500
+  auxillaryTorque: 0
   max_torque: 400
   all_wheel_drive: 1
   max_steer_angle: 30
@@ -7642,7 +7660,7 @@ MonoBehaviour:
   wheel_base: 1.5
   rear_track: 1.085
   turn_radius: 3.14
-  enable_anti_roll_bars: 0
+  enable_anti_roll_bars: 1
   AntiRoll: 5000
   enableTimer: 0
 --- !u!23 &957574019366477914

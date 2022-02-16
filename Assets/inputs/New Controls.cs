@@ -41,6 +41,22 @@ public class @NewControls : IInputActionCollection, IDisposable
                     ""expectedControlType"": ""Axis"",
                     ""processors"": """",
                     ""interactions"": ""Press(pressPoint=1E-10,behavior=2)""
+                },
+                {
+                    ""name"": ""ShiftUp"",
+                    ""type"": ""Button"",
+                    ""id"": ""7ff62607-9fb2-4fe1-b382-5e956c560bec"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": ""Press(pressPoint=1E-10)""
+                },
+                {
+                    ""name"": ""ShiftDown"",
+                    ""type"": ""Button"",
+                    ""id"": ""32635704-3996-4c71-af47-f9cb0909fcc0"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": ""Press(pressPoint=1E-10)""
                 }
             ],
             ""bindings"": [
@@ -164,6 +180,28 @@ public class @NewControls : IInputActionCollection, IDisposable
                     ""action"": ""Steering"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""8217758f-5a1c-442c-84ea-37a2c210bcfe"",
+                    ""path"": ""<Keyboard>/e"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ShiftUp"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""d51d0cb9-9cd0-411b-ae48-dadd0e981f68"",
+                    ""path"": ""<Keyboard>/q"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ShiftDown"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -175,6 +213,8 @@ public class @NewControls : IInputActionCollection, IDisposable
         m_Track_Throttle = m_Track.FindAction("Throttle", throwIfNotFound: true);
         m_Track_Brake = m_Track.FindAction("Brake", throwIfNotFound: true);
         m_Track_Steering = m_Track.FindAction("Steering", throwIfNotFound: true);
+        m_Track_ShiftUp = m_Track.FindAction("ShiftUp", throwIfNotFound: true);
+        m_Track_ShiftDown = m_Track.FindAction("ShiftDown", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -227,6 +267,8 @@ public class @NewControls : IInputActionCollection, IDisposable
     private readonly InputAction m_Track_Throttle;
     private readonly InputAction m_Track_Brake;
     private readonly InputAction m_Track_Steering;
+    private readonly InputAction m_Track_ShiftUp;
+    private readonly InputAction m_Track_ShiftDown;
     public struct TrackActions
     {
         private @NewControls m_Wrapper;
@@ -234,6 +276,8 @@ public class @NewControls : IInputActionCollection, IDisposable
         public InputAction @Throttle => m_Wrapper.m_Track_Throttle;
         public InputAction @Brake => m_Wrapper.m_Track_Brake;
         public InputAction @Steering => m_Wrapper.m_Track_Steering;
+        public InputAction @ShiftUp => m_Wrapper.m_Track_ShiftUp;
+        public InputAction @ShiftDown => m_Wrapper.m_Track_ShiftDown;
         public InputActionMap Get() { return m_Wrapper.m_Track; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -252,6 +296,12 @@ public class @NewControls : IInputActionCollection, IDisposable
                 @Steering.started -= m_Wrapper.m_TrackActionsCallbackInterface.OnSteering;
                 @Steering.performed -= m_Wrapper.m_TrackActionsCallbackInterface.OnSteering;
                 @Steering.canceled -= m_Wrapper.m_TrackActionsCallbackInterface.OnSteering;
+                @ShiftUp.started -= m_Wrapper.m_TrackActionsCallbackInterface.OnShiftUp;
+                @ShiftUp.performed -= m_Wrapper.m_TrackActionsCallbackInterface.OnShiftUp;
+                @ShiftUp.canceled -= m_Wrapper.m_TrackActionsCallbackInterface.OnShiftUp;
+                @ShiftDown.started -= m_Wrapper.m_TrackActionsCallbackInterface.OnShiftDown;
+                @ShiftDown.performed -= m_Wrapper.m_TrackActionsCallbackInterface.OnShiftDown;
+                @ShiftDown.canceled -= m_Wrapper.m_TrackActionsCallbackInterface.OnShiftDown;
             }
             m_Wrapper.m_TrackActionsCallbackInterface = instance;
             if (instance != null)
@@ -265,6 +315,12 @@ public class @NewControls : IInputActionCollection, IDisposable
                 @Steering.started += instance.OnSteering;
                 @Steering.performed += instance.OnSteering;
                 @Steering.canceled += instance.OnSteering;
+                @ShiftUp.started += instance.OnShiftUp;
+                @ShiftUp.performed += instance.OnShiftUp;
+                @ShiftUp.canceled += instance.OnShiftUp;
+                @ShiftDown.started += instance.OnShiftDown;
+                @ShiftDown.performed += instance.OnShiftDown;
+                @ShiftDown.canceled += instance.OnShiftDown;
             }
         }
     }
@@ -274,5 +330,7 @@ public class @NewControls : IInputActionCollection, IDisposable
         void OnThrottle(InputAction.CallbackContext context);
         void OnBrake(InputAction.CallbackContext context);
         void OnSteering(InputAction.CallbackContext context);
+        void OnShiftUp(InputAction.CallbackContext context);
+        void OnShiftDown(InputAction.CallbackContext context);
     }
 }

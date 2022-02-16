@@ -20,6 +20,11 @@ public class drive_script : MonoBehaviour
     public WheelCollider[] wheel_colliders;
     public GameObject[] wheels;
     public AnimationCurve engineCurve;
+    public List<float> gearRatios;
+    public float primaryGearRatio;
+    public float finalDriveRatio;
+    public float idleRPM = 1500;
+    public float auxillaryTorque = 0;
     
 
     [Header("Drivetrain")]
@@ -47,7 +52,7 @@ public class drive_script : MonoBehaviour
     private float steer_angle_left;
     private float steer_angle_right;
 
-    private float accel;
+    private float userInput;
 
     private float throttle;    
     private float brake;
@@ -61,6 +66,13 @@ public class drive_script : MonoBehaviour
     private bool timerOn = false;
     private bool speedReached = false;
     public bool enableTimer;
+
+    private float currentGear;
+    private float engineRPM;
+    private float shiftUp;
+    private float shiftDown;
+    private float engineTorque;
+    private float wheelTorque;
 
 
 
@@ -95,7 +107,8 @@ public class drive_script : MonoBehaviour
         engineCurve.AddKey(13000,40.536f);
         engineCurve.AddKey(13500,38.243f);
         engineCurve.AddKey(14000,35.198f);
-        Debug.Log("engine curve updated");
+        
+
         
 
     }
@@ -109,67 +122,90 @@ public class drive_script : MonoBehaviour
     void Start(){
 
                 
-        car = GetComponent<Rigidbody> ();   
+        car = GetComponent<Rigidbody> ();
+        engineRPM = idleRPM;   
         
         
     }
+
+    
 
 
     // FixedUpdate is called once per frame
     void FixedUpdate(){
         
-        throttle = keys.Track.Throttle.ReadValue<float>();
-        brake = keys.Track.Brake.ReadValue<float>();
-
-        // 0 means not pressed, 1 means fully pressed
-        throttle = Mathf.Clamp(throttle, -0.4053848f,0.1921842f); 
-        brake = Mathf.Clamp(brake, 0.8276286f,-0.6f);
-        
-        throttle = (throttle - -0.336f)/(0.0895f - -0.336f);
-        brake = (brake - 0.8276286f)/(-0.6f - 0.8276286f);
-        brake=0;
-        // steer = Input.GetAxis("Horizontal");
-        // -1 means left and +1 means right. 0 means no steering
-        steerInput = keys.Track.Steering.ReadValue<float>();
-        steerInput = Mathf.Clamp(steerInput, -1,1);     
-
-
-        // steerInput = keys.Track.Steering.ReadValue<float>();
         // throttle = keys.Track.Throttle.ReadValue<float>();
         // brake = keys.Track.Brake.ReadValue<float>();
 
-        // steerInput = Mathf.Clamp(steerInput, -1,1);
-        // throttle = Mathf.Clamp(throttle, 0,1);
-        // brake = Mathf.Clamp(brake, 0,1);
+        // // 0 means not pressed, 1 means fully pressed
+        // throttle = Mathf.Clamp(throttle, -0.4053848f,0.1921842f); 
+        // brake = Mathf.Clamp(brake, 0.8276286f,-0.6f);
+        
+        // throttle = (throttle - -0.336f)/(0.0895f - -0.336f);
+        // brake = (brake - 0.8276286f)/(-0.6f - 0.8276286f);
+        // brake=0;
+        // // steer = Input.GetAxis("Horizontal");
+        // // -1 means left and +1 means right. 0 means no steering
+        // steerInput = keys.Track.Steering.ReadValue<float>();
+        // steerInput = Mathf.Clamp(steerInput, -1,1);     
+
+
+        steerInput = keys.Track.Steering.ReadValue<float>();
+        throttle = keys.Track.Throttle.ReadValue<float>();
+        brake = keys.Track.Brake.ReadValue<float>();
+
+        shiftUp = keys.Track.ShiftUp.ReadValue<float>();
+        shiftDown = keys.Track.ShiftDown.ReadValue<float>();
+        
+
+        steerInput = Mathf.Clamp(steerInput, -1,1);
+        throttle = Mathf.Clamp(throttle, 0,1);
+        brake = Mathf.Clamp(brake, 0,1);
       
 
         if (throttle > brake){
-            accel = throttle;
+            userInput = throttle;
         }
         else{
-            accel = -brake;
+            userInput = -brake;
         }
+
+        if(shiftUp == 1){
+            currentGear += 1;
+        }
+        else if(shiftDown == 1){
+            currentGear -= 1;
+            
+        }
+        currentGear = Mathf.Clamp(currentGear, 0,5);
+        engineTorque = engineCurve.Evaluate(engineRPM) * userInput - auxillaryTorque;
+
+
+        
 
         // Calls the function to drive the car
-        drive(accel,steerInput);
-
-        float carSpeed = car.velocity.z;
-        if(carSpeed > 0 & speedReached == false){
-            timerOn = true;
-        }
-
-        if(timerOn == true){
-            theTime += Time.fixedDeltaTime;
-            
-            if(carSpeed >= 26.8f){
-                speedReached = true;
-                timerOn = false;
-            }
-        }
+        drive(userInput,steerInput);
 
         if(enableTimer == true){
-            Debug.Log($"Timer = {theTime}");
+            float carSpeed = car.velocity.z;
+            if(carSpeed > 0 & speedReached == false){
+                timerOn = true;
+            }
+
+            if(timerOn == true){
+                theTime += Time.fixedDeltaTime;
+                
+                if(carSpeed >= 26.8f){
+                    speedReached = true;
+                    timerOn = false;
+                }
+            }
+
+            
+                Debug.Log($"Timer = {theTime}");
         }
+
+        
 
     }
 
@@ -299,5 +335,15 @@ public class drive_script : MonoBehaviour
 
         }
     }
+
+    float getCrankShaftTorque(float throttle, float engineRPM, AnimationCurve engineCurve, float auxillaryTorque){
+        return throttle * engineCurve.Evaluate(engineRPM) - auxillaryTorque;
+    }
+
+    
+
+
+
+
 
 }
