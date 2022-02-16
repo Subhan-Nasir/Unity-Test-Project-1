@@ -44,19 +44,19 @@ public class @NewControls : IInputActionCollection, IDisposable
                 },
                 {
                     ""name"": ""ShiftUp"",
-                    ""type"": ""Button"",
+                    ""type"": ""Value"",
                     ""id"": ""7ff62607-9fb2-4fe1-b382-5e956c560bec"",
-                    ""expectedControlType"": ""Button"",
+                    ""expectedControlType"": ""Digital"",
                     ""processors"": """",
-                    ""interactions"": ""Press(pressPoint=1E-10)""
+                    ""interactions"": ""Press(behavior=1)""
                 },
                 {
                     ""name"": ""ShiftDown"",
-                    ""type"": ""Button"",
+                    ""type"": ""Value"",
                     ""id"": ""32635704-3996-4c71-af47-f9cb0909fcc0"",
-                    ""expectedControlType"": ""Button"",
+                    ""expectedControlType"": ""Digital"",
                     ""processors"": """",
-                    ""interactions"": ""Press(pressPoint=1E-10)""
+                    ""interactions"": ""Press(behavior=1)""
                 }
             ],
             ""bindings"": [

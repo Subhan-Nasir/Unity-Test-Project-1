@@ -13,6 +13,27 @@ public class RaycastController : MonoBehaviour{
     public List<GameObject> wheelObjects;
     public List<GameObject> meshes;
 
+    [Header("Drivetrain")]
+    public AnimationCurve engineCurve;
+    public List<float> gearRatios;
+    public float primaryGearRatio;
+    public float finalDriveRatio;
+    public float idleRPM = 1500;
+    public float auxillaryLoss = 0.15f;
+    public float maxEngineBrakingTorque = 5;
+    public float totalDrivetrainInertia = 1.5f;
+
+
+    private int currentGear;
+    private float engineRPM;
+    private float shiftUp;
+    private float shiftDown;
+    private float engineTorque;
+    private float wheelTorque;
+    private float engineBraking;
+
+
+
 
     [Header("Centre of mass")]    
     public GameObject COM_Fidner;
@@ -49,15 +70,7 @@ public class RaycastController : MonoBehaviour{
         {"m", 2.533E-7f}
     };
 
-    // private Dictionary<string, float> longitudinalConstants = new Dictionary<string, float>(){
-    //     {"B", 11.95f},
-    //     {"C", 1.515f},
-    //     {"D", 1609},
-    //     {"E", 0.1497f},
-    //     {"c", 0.001926f},
-    //     {"m", 4.03E-7f}     
-    // };
-    
+        
     private Dictionary<string, float> longitudinalConstants = new Dictionary<string, float>(){
         {"B", 11.93f},
         {"C", 1.716f},
@@ -110,7 +123,7 @@ public class RaycastController : MonoBehaviour{
         
         for (int i = 0; i < 4; i++){
             suspensions[i] = new Suspension(i, naturalLength, springTravel, springStiffness, dampingCoefficient, bumpStiffness, bumpTravel, wheelRadius);                     
-            wheels[i] = new Wheel(i, wheelObjects[i], rb, wheelRadius, wheelMass, brakeBias, longitudinalConstants, lateralConstants);
+            wheels[i] = new Wheel(i, wheelObjects[i], rb, wheelRadius, wheelMass, brakeBias, totalDrivetrainInertia, longitudinalConstants, lateralConstants);
             
         }
         
@@ -122,6 +135,32 @@ public class RaycastController : MonoBehaviour{
     void OnEnable(){
         
         keys.Enable();
+
+        engineCurve.keys = new Keyframe[1];
+        engineCurve.AddKey(3000,38.216f);
+        engineCurve.AddKey(3500,39.063f);
+        engineCurve.AddKey(4000,35.961f);
+        engineCurve.AddKey(4500,38.928f);
+        engineCurve.AddKey(5000,40.732f);
+        engineCurve.AddKey(5500,41.690f);
+        engineCurve.AddKey(6000,41.301f);
+        engineCurve.AddKey(6500,37.138f);
+        engineCurve.AddKey(7000,39.776f);
+        engineCurve.AddKey(7500,38.928f);
+        engineCurve.AddKey(8000,44.328f);
+        engineCurve.AddKey(8500,48.926f);
+        engineCurve.AddKey(9000,47.236f);
+        engineCurve.AddKey(9500,45.724f);
+        engineCurve.AddKey(10000,47.711f);
+        engineCurve.AddKey(10500,48.212f);
+        engineCurve.AddKey(11000,48.099f);
+        engineCurve.AddKey(11500,45.760f);
+        engineCurve.AddKey(12000,44.328f);
+        engineCurve.AddKey(12500,42.954f);
+        engineCurve.AddKey(13000,40.536f);
+        engineCurve.AddKey(13500,38.243f);
+        engineCurve.AddKey(14000,35.198f);
+        
         
         
     }
@@ -164,6 +203,8 @@ public class RaycastController : MonoBehaviour{
         throttle = Mathf.Clamp(throttle, 0,1);
         brake = Mathf.Clamp(brake, 0,1);
       
+        shiftUp = keys.Track.ShiftUp.ReadValue<float>();
+        shiftDown = keys.Track.ShiftDown.ReadValue<float>();
         
         if(throttle > brake){
             userInput = throttle;
@@ -171,6 +212,29 @@ public class RaycastController : MonoBehaviour{
         else{
             userInput = -brake;
         }
+
+        if(shiftUp == 1){
+            currentGear += 1;
+                     
+        }
+        else if(shiftDown == 1){
+            currentGear -= 1;
+                       
+        }
+        else{
+            currentGear += 0;
+        }
+
+        currentGear = Mathf.Clamp(currentGear, 0,1);
+
+
+        // engineRPM = Mathf.Clamp(engineRPM, idleRPM, 14000);
+        engineTorque = (1-auxillaryLoss) * (engineCurve.Evaluate(engineRPM) * userInput);
+        engineBraking = maxEngineBrakingTorque * (1 - userInput);
+        
+        // Debug.Log($"Shift up = {shiftUp}, Shift down = {shiftDown}, current gear = {currentGear}");
+        
+
 
         
         ApplySteering();     
@@ -188,7 +252,14 @@ public class RaycastController : MonoBehaviour{
                 
                 // Suspension force in the vertical direction.
                 Vector3 suspensionForceVector = suspensions[i].getUpdatedForce(hit, Time.fixedDeltaTime, contact);
-                Vector3 wheelForceVector = wheels[i].getUpdatedForce(userInput, hit, Time.fixedDeltaTime, suspensions[i].forceVector.magnitude);            
+
+                if(i == 2 | i == 3){
+                    wheels[i].wheelTorque = (engineTorque - engineBraking) * gearRatios[currentGear + 1] *primaryGearRatio * finalDriveRatio;
+                }
+                
+                
+
+                Vector3 wheelForceVector = wheels[i].getUpdatedForce(userInput, gearRatios[currentGear + 1], finalDriveRatio, primaryGearRatio, hit, Time.fixedDeltaTime, suspensions[i].forceVector.magnitude);            
 
                                 
                 rb.AddForceAtPosition(wheelForceVector + suspensionForceVector, hit.point + new Vector3 (0,0.1f,0)); 
@@ -209,6 +280,16 @@ public class RaycastController : MonoBehaviour{
                 if(i == 2){
                     RL_springLength = suspensions[i].springLength;
                 }
+
+                float averageRearRPM = (9.5493f)*(wheels[2].omega + wheels[3].omega)/2;
+                if(currentGear != 0){
+                    engineRPM = averageRearRPM * (gearRatios[currentGear + 1] * primaryGearRatio * finalDriveRatio);
+                }
+                Debug.Log($"Engine RPM = {engineRPM}, Engine Torque = {engineTorque}, Current Gear = {currentGear}");
+                
+                
+                
+                
 
                 
             }

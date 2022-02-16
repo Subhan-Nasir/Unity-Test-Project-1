@@ -55,7 +55,7 @@ public class Suspension{
 
         if(springLength < minLength){
             springForce = springStiffness * (naturalLength - springLength) + bumpStiffness * (minLength - springLength);
-            Debug.Log($"Bumpstop activated for suspension {id}");            
+                       
         }
         else{
             springForce = springStiffness * (naturalLength - springLength);

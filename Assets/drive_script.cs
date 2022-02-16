@@ -24,7 +24,7 @@ public class drive_script : MonoBehaviour
     public float primaryGearRatio;
     public float finalDriveRatio;
     public float idleRPM = 1500;
-    public float auxillaryTorque = 0;
+    public float auxillaryLoss = 0.15f;
     
 
     [Header("Drivetrain")]
@@ -177,8 +177,8 @@ public class drive_script : MonoBehaviour
             currentGear -= 1;
             
         }
-        currentGear = Mathf.Clamp(currentGear, 0,5);
-        engineTorque = engineCurve.Evaluate(engineRPM) * userInput - auxillaryTorque;
+       
+
 
 
         
@@ -336,9 +336,7 @@ public class drive_script : MonoBehaviour
         }
     }
 
-    float getCrankShaftTorque(float throttle, float engineRPM, AnimationCurve engineCurve, float auxillaryTorque){
-        return throttle * engineCurve.Evaluate(engineRPM) - auxillaryTorque;
-    }
+   
 
     
 
