@@ -18,6 +18,8 @@ public class RaycastController : MonoBehaviour{
     public List<GameObject> wheelObjects;
     public List<GameObject> meshes;
 
+    public static RaycastController cc;
+
     [Header("Engine")]
     public AnimationCurve engineCurve;
 
@@ -31,8 +33,8 @@ public class RaycastController : MonoBehaviour{
     public float totalDrivetrainInertia = 1.5f;
 
 
-    public int currentGear = 1;
-    public float engineRPM;
+    private int currentGear = 1;
+    private float engineRPM;
     private float shiftUp;
     private float shiftDown;
     private float engineTorque;
@@ -124,7 +126,10 @@ public class RaycastController : MonoBehaviour{
     private bool speedReached = false;
 
     [UPyPlot.UPyPlotController.UPyProbe]
-    private float RL_springLength;
+    private float RL_LateralForce;
+
+    [UPyPlot.UPyPlotController.UPyProbe]
+    private float FL_LateralForce;
 
     private float gearTimer;
 
@@ -139,7 +144,7 @@ public class RaycastController : MonoBehaviour{
         
         for (int i = 0; i < 4; i++){
             suspensions[i] = new Suspension(i, naturalLength, springTravel, springStiffness, dampingCoefficient, bumpStiffness, bumpTravel, wheelRadius);                     
-            wheels[i] = new Wheel(i, wheelObjects[i], rb, wheelRadius, wheelMass, brakeBias, totalDrivetrainInertia, longitudinalConstants, lateralConstants);
+            wheels[i] = new Wheel(i, wheelObjects[i], meshes[i], rb, wheelRadius, wheelMass, brakeBias, totalDrivetrainInertia, longitudinalConstants, lateralConstants);
             
         }
         
@@ -190,7 +195,9 @@ public class RaycastController : MonoBehaviour{
     void Start(){
         //
 
-        
+        cc=this;
+        rb.inertiaTensor = new Vector3(123.1586f,61.15857f,112f);
+        rb.inertiaTensorRotation = Quaternion.Euler(33.5407f,0,0);
         
     }
 
@@ -227,11 +234,11 @@ public class RaycastController : MonoBehaviour{
         shiftUp = keys.Track.ShiftUp.ReadValue<float>();
         shiftDown = keys.Track.ShiftDown.ReadValue<float>();
         
-        if(throttle > brake){
+        if(throttle > Mathf.Abs(brake)){
             userInput = throttle;
         }
         else{
-            userInput = -brake;
+            userInput = brake;
         }
 
 
@@ -286,10 +293,7 @@ public class RaycastController : MonoBehaviour{
                 
                 
 
-                // Only for testing plotting tool.
-                if(i == 2){
-                    RL_springLength = suspensions[i].springLength;
-                }
+                
 
                 float averageRearRPM = (9.5493f)*(wheels[2].omega + wheels[3].omega)/2;
                 if(currentGear != 0){
@@ -307,10 +311,12 @@ public class RaycastController : MonoBehaviour{
         speed = rb.velocity.magnitude;
         drag = (5f * 1.225f * Mathf.Pow(speed,2) * 0.947f)/2;
         lift = (0.17f * 1.225f * Mathf.Pow(speed,2) * 0.947f)/2;
-        Debug.Log($" Drag = {drag}, Lift = {lift}");
+        // Debug.Log($" Drag = {drag}, Lift = {lift}");
 
-        rb.AddForceAtPosition( -drag*transform.forward, COM_Fidner.transform.position);
-        rb.AddForceAtPosition( lift*transform.up, COM_Fidner.transform.position);
+        // rb.AddForceAtPosition( -drag*transform.forward, COM_Fidner.transform.position);
+        // rb.AddForceAtPosition( lift*transform.up, COM_Fidner.transform.position);
+        FL_LateralForce = wheels[0].lateralForce;
+        RL_LateralForce = wheels[3].lateralForce;
     }
     
 
@@ -431,6 +437,9 @@ public class RaycastController : MonoBehaviour{
     public float getSteeringAngleR(){return steerAngleRight;}
     public float getAccel(){return userInput;}
 
+    public float getEngineRPM(){return engineRPM;}
+    public int getCurrentGear(){return currentGear;}
+
 
     public float getAntiRollForce(Suspension leftSuspension, Suspension rightSuspension, float antiRollStiffness, float wheelId){
 
@@ -458,6 +467,8 @@ public class RaycastController : MonoBehaviour{
         else{
             return 0;
         }
+
+
 
         
         

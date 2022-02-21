@@ -65,10 +65,10 @@ public class Wheel{
     
 
 
-    public Wheel(float id, GameObject wheelObject, Rigidbody rb, float wheelRadius, float wheelMass, float brakeBias, float totalDrivetrainInertia, Dictionary<string, float> longitudinalConstants, Dictionary<string, float> lateralConstants){
+    public Wheel(float id, GameObject wheelObject, GameObject wheelMesh, Rigidbody rb, float wheelRadius, float wheelMass, float brakeBias, float totalDrivetrainInertia, Dictionary<string, float> longitudinalConstants, Dictionary<string, float> lateralConstants){
         this.id = id;
         this.wheelObject = wheelObject;
-        // this.wheelMesh = wheelMesh;
+        this.wheelMesh = wheelMesh;
         this.rb = rb;
         this.wheelRadius = wheelRadius;
         this.wheelMass = wheelMass;
@@ -172,8 +172,8 @@ public class Wheel{
         lateralVelocity = wheelVelocityLS.x;
         longitudinalVelocity = wheelVelocityLS.z;              
                
-        fLongLimit = tyreCurvePeak(c_long, m_long, D_long, verticalLoad);
-        fLatLimit = tyreCurvePeak(c_lat, m_lat, D_lat, verticalLoad);
+        fLongLimit = 0.7f*tyreCurvePeak(c_long, m_long, D_long, verticalLoad);
+        fLatLimit = 0.7f*tyreCurvePeak(c_lat, m_lat, D_lat, verticalLoad);
         
         fLongDynamicLimit = dynamicPeakLongitudinal(lateralForce, fLongLimit, fLatLimit);
         fLatDynamicLimit = dynamicPeakLateral(longitudinalForce, fLongLimit, fLatLimit);
@@ -188,7 +188,7 @@ public class Wheel{
 
 
         if(userInput <0){
-            if(longitudinalVelocity > 1){
+            if(Mathf.Abs(longitudinalVelocity) > 1){
                 if(id == 0 | id == 1){
                     brakingTorque = 400* userInput * (1 - brakeBias);
                 }
@@ -198,7 +198,7 @@ public class Wheel{
 
                 
             }
-            else if (longitudinalVelocity <= 1){
+            else if (Mathf.Abs(longitudinalVelocity) <= 1){
                 brakingTorque = 400 * userInput ;
 
                 if(id == 0 | id == 1){
@@ -251,21 +251,28 @@ public class Wheel{
         //     omega = Mathf.Clamp(omega, 0, (1/9.5493f) * 14000/(currentGearRatio * finalDriveRatio * primaryGearRatio));
         // }   
 
-        if(longitudinalVelocity >= 0){
+        
+        
+        if(id == 2 | id == 3){
+            omega = Mathf.Clamp(omega, (1/9.5493f) * 1650/(currentGearRatio * finalDriveRatio * primaryGearRatio), (1/9.5493f) * 14000/(currentGearRatio * finalDriveRatio * primaryGearRatio));
+        }
+        else{
+            omega = Mathf.Clamp(omega, -100000000f,10000000000f);
+        }    
+            
                 
-                omega = Mathf.Clamp(omega, (1/9.5493f) * 1650/(currentGearRatio * finalDriveRatio * primaryGearRatio), (1/9.5493f) * 14000/(currentGearRatio * finalDriveRatio * primaryGearRatio));
                 
-                
-            }
-            else if (longitudinalVelocity < 0){
-                omega = Mathf.Clamp(omega, -10000000, 0);
-            }     
+        
+        
+           
+            
+             
 
-        // wheelMesh.transform.Rotate(Mathf.Rad2Deg * omega * timeDelta, 0, 0, Space.Self); 
+        wheelMesh.transform.Rotate(Mathf.Rad2Deg * omega * timeDelta, 0, 0, Space.Self); 
 
         
         slipRatio = calculateSlipRatio(longitudinalVelocity, omega, wheelRadius);        
-        longitudinalForce =complexTyreEquation(slipRatio, fLongDynamicLimit, C_long, B_long, E_long);        
+        longitudinalForce = complexTyreEquation(slipRatio, fLongDynamicLimit, C_long, B_long, E_long);        
 
         slipAngle = calculateSlipAngle(longitudinalVelocity, lateralVelocity, threshold: 0.1f);     
         lateralForce = complexTyreEquation(slipAngle, fLatDynamicLimit, C_lat, B_lat, E_lat);
@@ -285,7 +292,7 @@ public class Wheel{
        
         // Debug.Log($"Wheel id = {id}, Longitudinal Velocity = {longitudinalVelocity}, wR = {omega*wheelRadius}, slip ratio = {slipRatio} ");
         
-        // Debug.Log($" Wheel id = {id}, Limits = ({fLongLimit},{fLatLimit}), Dynamic Limits = ({fLongDynamicLimit},{fLatDynamicLimit}), Forces = ({longitudinalForce},{lateralForce}), Load = {verticalLoad}");
+        Debug.Log($" Wheel id = {id}, Limits = ({fLongLimit},{fLatLimit}), Dynamic Limits = ({fLongDynamicLimit},{fLatDynamicLimit}), Forces = ({longitudinalForce},{lateralForce}), Load = {verticalLoad}");
         // Debug.Log($"Wheel id = {id}, Longitudinal Velocity = {longitudinalVelocity}, Lateral Velocity = {lateralVelocity}, slip ratio = {slipRatio}, slip angle = {slipAngle}");
 
 

@@ -33,8 +33,11 @@ public class Tachometer : MonoBehaviour
 
     private void Update()
     {
-        rpm = GameObject.Find("Raycast Reworked").GetComponent<RaycastController>().engineRPM/1000;
-        gear=GameObject.Find("Raycast Reworked").GetComponent<RaycastController>().currentGear;
+        RaycastController carController=target.GetComponent<RaycastController>();
+        rpm=carController.getEngineRPM()/1000;
+        gear=carController.getCurrentGear();
+        //rpm = GameObject.Find("Raycast Reworked").GetComponent<RaycastController>().engineRPM/1000;
+       // gear=GameObject.Find("Raycast Reworked").GetComponent<RaycastController>().currentGear;
         speed=target.velocity.magnitude*2.237f;
 
         if (speedLabel != null)
@@ -47,7 +50,7 @@ public class Tachometer : MonoBehaviour
     }
 
     private void CreateRPMLabels(){
-        int labelAmount=17;
+        int labelAmount=14;
         float totalAngleSize= minRPMArrowAngle-maxRPMArrowAngle;
         float rpmNormalised= rpm/maxRPM;
 
