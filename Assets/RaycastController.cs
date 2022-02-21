@@ -24,8 +24,8 @@ public class RaycastController : MonoBehaviour{
     public float totalDrivetrainInertia = 1.5f;
 
 
-    private int currentGear = 1;
-    private float engineRPM;
+    public int currentGear = 1;
+    public float engineRPM;
     private float shiftUp;
     private float shiftDown;
     private float engineTorque;
