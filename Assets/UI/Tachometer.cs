@@ -56,6 +56,7 @@ public class Tachometer : MonoBehaviour
             float labelRPMNormalised= (float)i/labelAmount;
             RPMLabelTransform.eulerAngles = new Vector3(0,0,minRPMArrowAngle-labelRPMNormalised * totalAngleSize);
             RPMLabelTransform.Find("RPMLabelText").GetComponent<Text>().text=Mathf.RoundToInt(labelRPMNormalised * maxRPM).ToString();
+            //RPMLabelTransform.Find("RPMLabelText").eulerAngles= Vector3.zero;
             RPMLabelTransform.gameObject.SetActive(true);
         }
     }

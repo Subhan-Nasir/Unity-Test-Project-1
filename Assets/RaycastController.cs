@@ -52,6 +52,9 @@ public class RaycastController : MonoBehaviour{
     public float antiRollStiffness;
     private float[] antiRollForces = new float[] {0,0};
     
+    private float pitch;
+    private float lateralRoll;
+    private float longitudinalRoll;
     
     private Suspension[] suspensions = new Suspension[4];
     
@@ -184,26 +187,26 @@ public class RaycastController : MonoBehaviour{
         throttle = keys.Track.Throttle.ReadValue<float>();
         brake = keys.Track.Brake.ReadValue<float>();
 
-        // 0 means not pressed, 1 means fully pressed
-        throttle = Mathf.Clamp(throttle, -0.336f,0.0895f); 
-        brake = Mathf.Clamp(brake, -0.4513f,-0.0761f);
+        // // 0 means not pressed, 1 means fully pressed
+        // throttle = Mathf.Clamp(throttle, -0.336f,0.0895f); 
+        // brake = Mathf.Clamp(brake, -0.4513f,-0.0761f);
         
-        throttle = (throttle - -0.336f)/(0.0895f - -0.336f);
-        brake = (brake- - 0.4513f)/(-0.4513f - -0.0761f);
+        // throttle = (throttle - -0.336f)/(0.0895f - -0.336f);
+        // brake = (brake- - 0.4513f)/(-0.4513f - -0.0761f);
         
         // steer = Input.GetAxis("Horizontal");
         // -1 means left and +1 means right. 0 means no steering
-        steerInput = keys.Track.Steering.ReadValue<float>();
-        steerInput = Mathf.Clamp(steerInput, -1,1);     
-
-
         // steerInput = keys.Track.Steering.ReadValue<float>();
-        // throttle = keys.Track.Throttle.ReadValue<float>();
-        // brake = keys.Track.Brake.ReadValue<float>();
+        // steerInput = Mathf.Clamp(steerInput, -1,1);     
 
-        // steerInput = Mathf.Clamp(steerInput, -1,1);
-        // throttle = Mathf.Clamp(throttle, 0,1);
-        // brake = Mathf.Clamp(brake, 0,1);
+
+        steerInput = keys.Track.Steering.ReadValue<float>();
+        throttle = keys.Track.Throttle.ReadValue<float>();
+        brake = keys.Track.Brake.ReadValue<float>();
+
+        steerInput = Mathf.Clamp(steerInput, -1,1);
+        throttle = Mathf.Clamp(throttle, 0,1);
+        brake = Mathf.Clamp(brake, 0,1);
       
         shiftUp = keys.Track.ShiftUp.ReadValue<float>();
         shiftDown = keys.Track.ShiftDown.ReadValue<float>();
