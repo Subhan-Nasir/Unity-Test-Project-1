@@ -6,15 +6,22 @@ using System;
 
 public class RaycastController : MonoBehaviour{
 
-    
-    public Rigidbody rb;
+    [Header("Controls Selection")]
+    public bool usingKeyboard;
+
+    [Header("0 to 60 Timer")]
     public bool enableTimer;
+
+    [Header("Car Components ")]
+    public Rigidbody rb;    
     public List<GameObject> springs;
     public List<GameObject> wheelObjects;
     public List<GameObject> meshes;
 
-    [Header("Drivetrain")]
+    [Header("Engine")]
     public AnimationCurve engineCurve;
+
+    [Header("Transmission")]
     public List<float> gearRatios;
     public float primaryGearRatio;
     public float finalDriveRatio;
@@ -184,29 +191,34 @@ public class RaycastController : MonoBehaviour{
     }
 
     void Update(){
-        throttle = keys.Track.Throttle.ReadValue<float>();
-        brake = keys.Track.Brake.ReadValue<float>();
 
-        // // 0 means not pressed, 1 means fully pressed
-        // throttle = Mathf.Clamp(throttle, -0.336f,0.0895f); 
-        // brake = Mathf.Clamp(brake, -0.4513f,-0.0761f);
+        if(usingKeyboard){
+
+            steerInput = keys.Track.Steering.ReadValue<float>();
+            throttle = keys.Track.Throttle.ReadValue<float>();
+            brake = keys.Track.Brake.ReadValue<float>();
+
+            steerInput = Mathf.Clamp(steerInput, -1,1);
+            throttle = Mathf.Clamp(throttle, 0,1);
+            brake = Mathf.Clamp(brake, 0,1);
+        }
+        else{
+
+            throttle = keys.Track.Throttle.ReadValue<float>();
+            brake = keys.Track.Brake.ReadValue<float>();
+
+            // Clamp values 
+            throttle = Mathf.Clamp(throttle, -0.336f,0.0895f); 
+            brake = Mathf.Clamp(brake, -0.4513f,-0.0761f);
+            
+            // Normalise Values
+            throttle = (throttle - -0.336f)/(0.0895f - -0.336f);
+            brake = (brake- - 0.4513f)/(-0.4513f - -0.0761f);
+
+            steerInput = keys.Track.Steering.ReadValue<float>();
+            steerInput = Mathf.Clamp(steerInput, -1,1);
+        }
         
-        // throttle = (throttle - -0.336f)/(0.0895f - -0.336f);
-        // brake = (brake- - 0.4513f)/(-0.4513f - -0.0761f);
-        
-        // steer = Input.GetAxis("Horizontal");
-        // -1 means left and +1 means right. 0 means no steering
-        // steerInput = keys.Track.Steering.ReadValue<float>();
-        // steerInput = Mathf.Clamp(steerInput, -1,1);     
-
-
-        steerInput = keys.Track.Steering.ReadValue<float>();
-        throttle = keys.Track.Throttle.ReadValue<float>();
-        brake = keys.Track.Brake.ReadValue<float>();
-
-        steerInput = Mathf.Clamp(steerInput, -1,1);
-        throttle = Mathf.Clamp(throttle, 0,1);
-        brake = Mathf.Clamp(brake, 0,1);
       
         shiftUp = keys.Track.ShiftUp.ReadValue<float>();
         shiftDown = keys.Track.ShiftDown.ReadValue<float>();
@@ -241,13 +253,9 @@ public class RaycastController : MonoBehaviour{
 
         engineRPM = Mathf.Clamp(engineRPM, idleRPM, 14000);
         engineTorque = (1-auxillaryLoss) * (engineCurve.Evaluate(engineRPM) * userInput);
-        engineBraking = maxEngineBrakingTorque * (1 - userInput);
-        
+        engineBraking = maxEngineBrakingTorque * (1 - userInput);      
         // Debug.Log($"Shift up = {shiftUp}, Shift down = {shiftDown}, current gear = {currentGear}");
-        
 
-
-        
         ApplySteering();     
          
     }
@@ -261,33 +269,20 @@ public class RaycastController : MonoBehaviour{
           
             if(contact){            
                 
-                // Suspension force in the vertical direction.
-                Vector3 suspensionForceVector = suspensions[i].getUpdatedForce(hit, Time.fixedDeltaTime, contact);
-
                 if(i == 2 | i == 3){
                     wheels[i].wheelTorque = (engineTorque - engineBraking) * gearRatios[currentGear + 1] *primaryGearRatio * finalDriveRatio;
                 }
-                
-                
 
+                // Force vectors from suspension, wheel and anti rollbars.
+                Vector3 suspensionForceVector = suspensions[i].getUpdatedForce(hit, Time.fixedDeltaTime, contact);          
                 Vector3 wheelForceVector = wheels[i].getUpdatedForce(userInput, gearRatios[currentGear + 1], finalDriveRatio, primaryGearRatio, hit, Time.fixedDeltaTime, suspensions[i].forceVector.magnitude);            
+                Vector3 antiRollForceVector = getAntiRollForce(suspensions[2], suspensions[3], antiRollStiffness, i) * hit.normal;
 
-                                
                 rb.AddForceAtPosition(wheelForceVector + suspensionForceVector, hit.point + new Vector3 (0,0.1f,0)); 
                 
-                if(i == 2 | i == 3){
-                    antiRollForces = getAntiRollForces(suspensions[2], suspensions[3], antiRollStiffness);
-                }
+                
 
-                if(i == 2){
-                    rb.AddForceAtPosition(antiRollForces[0] * hit.normal, hit.point);
-                }
-                else if(i == 3){
-                    rb.AddForceAtPosition(antiRollForces[1] * hit.normal, hit.point);
-                }
-                // Debug.Log($"Anti roll bar forces = {antiRollForces[0]} and {antiRollForces[1]}");
-
-
+                // Only for testing plotting tool.
                 if(i == 2){
                     RL_springLength = suspensions[i].springLength;
                 }
@@ -296,25 +291,19 @@ public class RaycastController : MonoBehaviour{
                 if(currentGear != 0){
                     engineRPM = averageRearRPM * (gearRatios[currentGear + 1] * primaryGearRatio * finalDriveRatio);
                 }
-                Debug.Log($"Engine RPM = {engineRPM}, Engine Torque = {engineTorque}, Current Gear = {currentGear}, User Input = {userInput}");
-                
-                
-                
-                
-
-                
+                // Debug.Log($"Engine RPM = {engineRPM}, Engine Torque = {engineTorque}, Current Gear = {currentGear}, User Input = {userInput}");
+                                
             }
             else{
                 suspensions[i].contact = false;
-
             }
         }
 
+        showTimer(); 
+    }
+    
 
-
-
-
-        
+    void showTimer(){
         float carSpeed = rb.velocity.z;
         if(carSpeed > 0 & speedReached == false){
             timerOn = true;
@@ -332,13 +321,7 @@ public class RaycastController : MonoBehaviour{
         if(enableTimer == true){
             Debug.Log($"Timer = {theTime}");
         }
-
-       
-        
-        
-
     }
-    
 
     void OnDrawGizmos(){
 
@@ -438,7 +421,7 @@ public class RaycastController : MonoBehaviour{
     public float getAccel(){return userInput;}
 
 
-    public float[] getAntiRollForces(Suspension leftSuspension, Suspension rightSuspension, float antiRollStiffness){
+    public float getAntiRollForce(Suspension leftSuspension, Suspension rightSuspension, float antiRollStiffness, float wheelId){
 
         float travelLeft = 0;
         float travelRight = 0;
@@ -455,9 +438,17 @@ public class RaycastController : MonoBehaviour{
         float forceLeft = (travelLeft - travelRight) * antiRollStiffness;
         float forceRight = -forceLeft;
 
-        float[] forceArray = new float[] {forceLeft, forceRight};
+        if(wheelId == 2){
+            return forceLeft;
+        }
+        else if (wheelId == 3){
+            return forceRight;
+        }
+        else{
+            return 0;
+        }
 
-        return forceArray;
+        
         
 
     }
