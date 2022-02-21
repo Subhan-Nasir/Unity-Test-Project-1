@@ -172,8 +172,8 @@ public class Wheel{
         lateralVelocity = wheelVelocityLS.x;
         longitudinalVelocity = wheelVelocityLS.z;              
                
-        fLongLimit = 0.8f * tyreCurvePeak(c_long, m_long, D_long, verticalLoad);
-        fLatLimit = 0.8f * tyreCurvePeak(c_lat, m_lat, D_lat, verticalLoad);
+        fLongLimit = tyreCurvePeak(c_long, m_long, D_long, verticalLoad);
+        fLatLimit = tyreCurvePeak(c_lat, m_lat, D_lat, verticalLoad);
         
         fLongDynamicLimit = dynamicPeakLongitudinal(lateralForce, fLongLimit, fLatLimit);
         fLatDynamicLimit = dynamicPeakLateral(longitudinalForce, fLongLimit, fLatLimit);
@@ -286,7 +286,7 @@ public class Wheel{
         // Debug.Log($"Wheel id = {id}, Longitudinal Velocity = {longitudinalVelocity}, wR = {omega*wheelRadius}, slip ratio = {slipRatio} ");
         
         // Debug.Log($" Wheel id = {id}, Limits = ({fLongLimit},{fLatLimit}), Dynamic Limits = ({fLongDynamicLimit},{fLatDynamicLimit}), Forces = ({longitudinalForce},{lateralForce}), Load = {verticalLoad}");
-        Debug.Log($"Wheel id = {id}, Longitudinal Velocity = {longitudinalVelocity}, Lateral Velocity = {lateralVelocity}");
+        // Debug.Log($"Wheel id = {id}, Longitudinal Velocity = {longitudinalVelocity}, Lateral Velocity = {lateralVelocity}, slip ratio = {slipRatio}, slip angle = {slipAngle}");
 
 
         return forceVector;

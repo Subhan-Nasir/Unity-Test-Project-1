@@ -128,6 +128,10 @@ public class RaycastController : MonoBehaviour{
 
     private float gearTimer;
 
+    private float speed;
+    private float drag;
+    private float lift;
+
     void OnValidate(){
         keys = new NewControls();
         rb.centerOfMass = COM_Fidner.transform.localPosition;     
@@ -299,7 +303,14 @@ public class RaycastController : MonoBehaviour{
             }
         }
 
-        showTimer(); 
+        showTimer();
+        speed = rb.velocity.magnitude;
+        drag = (5f * 1.225f * Mathf.Pow(speed,2) * 0.947f)/2;
+        lift = (0.17f * 1.225f * Mathf.Pow(speed,2) * 0.947f)/2;
+        Debug.Log($" Drag = {drag}, Lift = {lift}");
+
+        rb.AddForceAtPosition( -drag*transform.forward, COM_Fidner.transform.position);
+        rb.AddForceAtPosition( lift*transform.up, COM_Fidner.transform.position);
     }
     
 
@@ -345,7 +356,7 @@ public class RaycastController : MonoBehaviour{
             Gizmos.DrawRay(wheels[i].wheelObject.transform.position, wheels[i].wheelObject.transform.right * (wheels[i].lateralForce/1000));
             Gizmos.DrawRay(wheels[i].wheelObject.transform.position, wheels[i].wheelObject.transform.forward * (wheels[i].longitudinalForce/1000));
             Gizmos.DrawRay(wheels[i].wheelObject.transform.position, wheels[i].wheelObject.transform.up * wheels[i].verticalLoad/1000);
-            
+            Gizmos.DrawRay(COM_Fidner.transform.position, -drag * transform.forward /1000);
             Gizmos.color = Color.yellow;
             if(i == 2 | i == 3){
                 Gizmos.DrawRay(wheels[i].wheelObject.transform.position, wheels[i].wheelObject.transform.up * antiRollForces[i-2]/1000);

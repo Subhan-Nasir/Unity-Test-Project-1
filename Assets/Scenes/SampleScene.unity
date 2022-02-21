@@ -4873,12 +4873,12 @@ MonoBehaviour:
   - 1.67
   - 1.44
   - 1.33
-  primaryGearRatio: 1.822
+  primaryGearRatio: 2.111
   finalDriveRatio: 4.67
   idleRPM: 1500
   auxillaryLoss: 0.15
   maxEngineBrakingTorque: 5
-  totalDrivetrainInertia: 1.5
+  totalDrivetrainInertia: 5
   currentGear: 1
   engineRPM: 14000
   COM_Fidner: {fileID: 490260644}
@@ -4889,7 +4889,7 @@ MonoBehaviour:
   bumpStiffness: 100000
   bumpTravel: 0.05
   antiRollStiffness: 0
-  wheelRadius: 0.23
+  wheelRadius: 0.22
   wheelMass: 5
   brakeBias: 0.5
   steerAngle: 13
