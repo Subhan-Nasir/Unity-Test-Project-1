@@ -25,9 +25,9 @@ public class VehicleUI : MonoBehaviour
         
 
         if (speedLabel != null)
-            speedLabel.text = "Speed: "+ (Math.Round(speed*2.237, 1)).ToString() + " mph";
+            speedLabel.text = (Math.Round(speed*2.237, 1)).ToString() + " mph";
 
        if (accelerationLabel != null)
-            accelerationLabel.text = "Acceleration:"+ Math.Round(acceleration,2)+ "m/s^2";              
+            accelerationLabel.text = Math.Round(acceleration,2)+ "m/s^2";              
     }
 }

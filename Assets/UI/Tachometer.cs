@@ -59,8 +59,12 @@ public class Tachometer : MonoBehaviour
             float labelRPMNormalised= (float)i/labelAmount;
             RPMLabelTransform.eulerAngles = new Vector3(0,0,minRPMArrowAngle-labelRPMNormalised * totalAngleSize);
             RPMLabelTransform.Find("RPMLabelText").GetComponent<Text>().text=Mathf.RoundToInt(labelRPMNormalised * maxRPM).ToString();
-            //RPMLabelTransform.Find("RPMLabelText").eulerAngles= Vector3.zero;
+            RPMLabelTransform.Find("RPMLabelText").eulerAngles= Vector3.zero;
             RPMLabelTransform.gameObject.SetActive(true);
+
+            if (i>=labelAmount-2 && i<=labelAmount){
+                RPMLabelTransform.Find("dashImage").GetComponent<Image>().color=new Color32( 254 , 9 , 0,255);
+            }
         }
     }
 }

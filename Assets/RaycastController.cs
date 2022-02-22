@@ -238,7 +238,7 @@ public class RaycastController : MonoBehaviour{
             userInput = throttle;
         }
         else{
-            userInput = brake;
+            userInput = -brake;
         }
 
 

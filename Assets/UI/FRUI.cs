@@ -44,7 +44,7 @@ public class FRUI : MonoBehaviour{
             }  
 
             if (forceLabel != null){
-                forceLabel.text = "(" + Math.Round(wheelsList[i].lateralForce,1).ToString()+ ","+ Math.Round(wheelsList[i].longitudinalForce,1).ToString()+")";
+                forceLabel.text = "(   " + Math.Round(wheelsList[i].lateralForce,1).ToString()+ "   ,   "+ Math.Round(wheelsList[i].longitudinalForce,1).ToString()+")";
             }  
 
             if (slipLabel != null){
