@@ -70,7 +70,7 @@ public class RaycastController : MonoBehaviour{
     [Header("Wheel")]
     public float wheelRadius = 0.23f;
     public float wheelMass = 5;
-    public float brakeBias = 0.5f;    
+    public float brakeBias;  
        
     
     private Dictionary<string, float> lateralConstants = new Dictionary<string,float>(){
@@ -137,9 +137,17 @@ public class RaycastController : MonoBehaviour{
     private float drag;
     private float lift;
 
+    private float brakeBiasUp;
+    private float brakeBiasDown;
+    private float brakeBiasTimer;
+    
+
+
+
     void OnValidate(){
         keys = new NewControls();
-        rb.centerOfMass = COM_Fidner.transform.localPosition;     
+        rb.centerOfMass = COM_Fidner.transform.localPosition;
+             
                            
         
         for (int i = 0; i < 4; i++){
@@ -217,6 +225,8 @@ public class RaycastController : MonoBehaviour{
 
             throttle = keys.Track.Throttle.ReadValue<float>();
             brake = keys.Track.Brake.ReadValue<float>();
+            brakeBiasUp = keys.Track.BrakeBiasUp.ReadValue<float>();
+            brakeBiasDown = keys.Track.BrakeBiasDown.ReadValue<float>();
 
             // Clamp values 
             throttle = Mathf.Clamp(throttle, -0.336f,0.0895f); 
@@ -224,7 +234,7 @@ public class RaycastController : MonoBehaviour{
             
             // Normalise Values
             throttle = (throttle - -0.336f)/(0.0895f - -0.336f);
-            brake = (brake- - 0.4513f)/(-0.4513f - -0.0761f);
+            brake = -(brake- - 0.4513f)/(-0.4513f - -0.0761f);
 
             steerInput = keys.Track.Steering.ReadValue<float>();
             steerInput = Mathf.Clamp(steerInput, -1,1);
@@ -256,16 +266,37 @@ public class RaycastController : MonoBehaviour{
             currentGear += 0;
         }
 
+        if(brakeBiasUp > 0 & brakeBiasTimer > 0.2f){
+            brakeBias += 0.1f;
+            brakeBiasTimer = 0;
+            Debug.Log("brake bias increased");
+        }
+        else if(brakeBiasDown > 0 & brakeBiasTimer > 0.2f){
+            brakeBias -= 0.1f;
+            brakeBiasTimer = 0;
+        }
+      
+        
+
+        brakeBias = Mathf.Clamp(brakeBias, 0,1);
+        for(int i = 0; i<4; i++){
+            wheels[i].brakeBias = brakeBias;
+        }
+
+        Debug.Log($" Brake bias = {wheels[0].brakeBias}, brakeBiasUp = {brakeBiasUp}, brakeBiasDown = {brakeBiasDown}, timer = {brakeBiasTimer}");
         gearTimer += Time.deltaTime;
+        brakeBiasTimer += Time.deltaTime;
 
 
         currentGear = Mathf.Clamp(currentGear, 1,5);
 
 
+        
         engineRPM = Mathf.Clamp(engineRPM, idleRPM, 14000);
+
         engineTorque = (1-auxillaryLoss) * (engineCurve.Evaluate(engineRPM) * userInput);
         engineBraking = maxEngineBrakingTorque * (1 - userInput);      
-        // Debug.Log($"Shift up = {shiftUp}, Shift down = {shiftDown}, current gear = {currentGear}");
+       
 
         ApplySteering();     
          

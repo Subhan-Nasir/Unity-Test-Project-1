@@ -189,7 +189,7 @@ public class Wheel{
 
         if(userInput <0){
             if(Mathf.Abs(longitudinalVelocity) > 1){
-                if(id == 0 | id == 1){
+                if(id == 2 | id == 3){
                     brakingTorque = 400* userInput * (1 - brakeBias);
                 }
                 else{
@@ -201,7 +201,7 @@ public class Wheel{
             else if (Mathf.Abs(longitudinalVelocity) <= 1){
                 brakingTorque = 400 * userInput ;
 
-                if(id == 0 | id == 1){
+                if(id == 2 | id == 3){
                     brakingTorque = 400* userInput * longitudinalVelocity * (1 - brakeBias);
                 }
                 else{
@@ -252,13 +252,19 @@ public class Wheel{
         // }   
 
         
-        
-        if(id == 2 | id == 3){
-            omega = Mathf.Clamp(omega, (1/9.5493f) * 1650/(currentGearRatio * finalDriveRatio * primaryGearRatio), (1/9.5493f) * 14000/(currentGearRatio * finalDriveRatio * primaryGearRatio));
+        if(userInput >=0){
+            if(id == 2 | id == 3){
+                omega = Mathf.Clamp(omega, (1/9.5493f) * 1650/(currentGearRatio * finalDriveRatio * primaryGearRatio), (1/9.5493f) * 14000/(currentGearRatio * finalDriveRatio * primaryGearRatio));
+            }
+            else{
+                omega = Mathf.Clamp(omega, -100000000f,10000000000f);
+            }
+            
         }
         else{
-            omega = Mathf.Clamp(omega, -100000000f,10000000000f);
-        }    
+            omega = Mathf.Clamp(omega, 0,10000000000f);
+        }
+            
             
                 
                 
@@ -292,7 +298,7 @@ public class Wheel{
        
         // Debug.Log($"Wheel id = {id}, Longitudinal Velocity = {longitudinalVelocity}, wR = {omega*wheelRadius}, slip ratio = {slipRatio} ");
         
-        Debug.Log($" Wheel id = {id}, Limits = ({fLongLimit},{fLatLimit}), Dynamic Limits = ({fLongDynamicLimit},{fLatDynamicLimit}), Forces = ({longitudinalForce},{lateralForce}), Load = {verticalLoad}");
+        // Debug.Log($" Wheel id = {id}, Limits = ({fLongLimit},{fLatLimit}), Dynamic Limits = ({fLongDynamicLimit},{fLatDynamicLimit}), Forces = ({longitudinalForce},{lateralForce}), Load = {verticalLoad}");
         // Debug.Log($"Wheel id = {id}, Longitudinal Velocity = {longitudinalVelocity}, Lateral Velocity = {lateralVelocity}, slip ratio = {slipRatio}, slip angle = {slipAngle}");
 
 

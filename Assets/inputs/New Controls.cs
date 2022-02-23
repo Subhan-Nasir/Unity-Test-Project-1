@@ -57,6 +57,22 @@ public class @NewControls : IInputActionCollection, IDisposable
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": ""Press(behavior=1)""
+                },
+                {
+                    ""name"": ""BrakeBiasUp"",
+                    ""type"": ""Button"",
+                    ""id"": ""6949abdc-b272-44ad-b8ed-ba5162a02666"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": ""Press(behavior=1)""
+                },
+                {
+                    ""name"": ""BrakeBiasDown"",
+                    ""type"": ""Button"",
+                    ""id"": ""9fc6041a-c222-4ae1-a4b5-55ac2dd875a2"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": ""Press(behavior=1)""
                 }
             ],
             ""bindings"": [
@@ -224,6 +240,28 @@ public class @NewControls : IInputActionCollection, IDisposable
                     ""action"": ""ShiftDown"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""dfa53dba-7dfb-45f4-8ecd-0f32f4791b64"",
+                    ""path"": ""<HID::Precision Sim Engineering SWD>/button18"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""BrakeBiasUp"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""b3b209aa-ef7f-4175-9839-7253d6b86905"",
+                    ""path"": ""<HID::Precision Sim Engineering SWD>/button17"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""BrakeBiasDown"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -237,6 +275,8 @@ public class @NewControls : IInputActionCollection, IDisposable
         m_Track_Steering = m_Track.FindAction("Steering", throwIfNotFound: true);
         m_Track_ShiftUp = m_Track.FindAction("ShiftUp", throwIfNotFound: true);
         m_Track_ShiftDown = m_Track.FindAction("ShiftDown", throwIfNotFound: true);
+        m_Track_BrakeBiasUp = m_Track.FindAction("BrakeBiasUp", throwIfNotFound: true);
+        m_Track_BrakeBiasDown = m_Track.FindAction("BrakeBiasDown", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -291,6 +331,8 @@ public class @NewControls : IInputActionCollection, IDisposable
     private readonly InputAction m_Track_Steering;
     private readonly InputAction m_Track_ShiftUp;
     private readonly InputAction m_Track_ShiftDown;
+    private readonly InputAction m_Track_BrakeBiasUp;
+    private readonly InputAction m_Track_BrakeBiasDown;
     public struct TrackActions
     {
         private @NewControls m_Wrapper;
@@ -300,6 +342,8 @@ public class @NewControls : IInputActionCollection, IDisposable
         public InputAction @Steering => m_Wrapper.m_Track_Steering;
         public InputAction @ShiftUp => m_Wrapper.m_Track_ShiftUp;
         public InputAction @ShiftDown => m_Wrapper.m_Track_ShiftDown;
+        public InputAction @BrakeBiasUp => m_Wrapper.m_Track_BrakeBiasUp;
+        public InputAction @BrakeBiasDown => m_Wrapper.m_Track_BrakeBiasDown;
         public InputActionMap Get() { return m_Wrapper.m_Track; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -324,6 +368,12 @@ public class @NewControls : IInputActionCollection, IDisposable
                 @ShiftDown.started -= m_Wrapper.m_TrackActionsCallbackInterface.OnShiftDown;
                 @ShiftDown.performed -= m_Wrapper.m_TrackActionsCallbackInterface.OnShiftDown;
                 @ShiftDown.canceled -= m_Wrapper.m_TrackActionsCallbackInterface.OnShiftDown;
+                @BrakeBiasUp.started -= m_Wrapper.m_TrackActionsCallbackInterface.OnBrakeBiasUp;
+                @BrakeBiasUp.performed -= m_Wrapper.m_TrackActionsCallbackInterface.OnBrakeBiasUp;
+                @BrakeBiasUp.canceled -= m_Wrapper.m_TrackActionsCallbackInterface.OnBrakeBiasUp;
+                @BrakeBiasDown.started -= m_Wrapper.m_TrackActionsCallbackInterface.OnBrakeBiasDown;
+                @BrakeBiasDown.performed -= m_Wrapper.m_TrackActionsCallbackInterface.OnBrakeBiasDown;
+                @BrakeBiasDown.canceled -= m_Wrapper.m_TrackActionsCallbackInterface.OnBrakeBiasDown;
             }
             m_Wrapper.m_TrackActionsCallbackInterface = instance;
             if (instance != null)
@@ -343,6 +393,12 @@ public class @NewControls : IInputActionCollection, IDisposable
                 @ShiftDown.started += instance.OnShiftDown;
                 @ShiftDown.performed += instance.OnShiftDown;
                 @ShiftDown.canceled += instance.OnShiftDown;
+                @BrakeBiasUp.started += instance.OnBrakeBiasUp;
+                @BrakeBiasUp.performed += instance.OnBrakeBiasUp;
+                @BrakeBiasUp.canceled += instance.OnBrakeBiasUp;
+                @BrakeBiasDown.started += instance.OnBrakeBiasDown;
+                @BrakeBiasDown.performed += instance.OnBrakeBiasDown;
+                @BrakeBiasDown.canceled += instance.OnBrakeBiasDown;
             }
         }
     }
@@ -354,5 +410,7 @@ public class @NewControls : IInputActionCollection, IDisposable
         void OnSteering(InputAction.CallbackContext context);
         void OnShiftUp(InputAction.CallbackContext context);
         void OnShiftDown(InputAction.CallbackContext context);
+        void OnBrakeBiasUp(InputAction.CallbackContext context);
+        void OnBrakeBiasDown(InputAction.CallbackContext context);
     }
 }
