@@ -4994,7 +4994,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 46be9f7aa45457c4f85158c3a67ea0c6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  usingKeyboard: 0
+  usingKeyboard: 1
   enableTimer: 0
   rb: {fileID: 1240391180}
   springs:
